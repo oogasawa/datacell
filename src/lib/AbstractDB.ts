@@ -76,7 +76,13 @@ export abstract class AbstractDB implements DataCellStore {
 
 
     /** @inheritdoc */
-    abstract deleteAllTables(): void;
+    deleteAllTables(): void {
+        const ts = this.getAllTables();
+        for (let t of ts) {
+            this._deleteTable(t);
+        }
+    }
+
 
 
     /** @inheritdoc */
