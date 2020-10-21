@@ -7,6 +7,12 @@ import { Readable } from "stream";
 export interface DataCellStore {
 
 
+	/** Close connection to the DataCellStore.
+	 *
+	 */
+    close(): void;
+
+
     getNameConverter(): NameConverter;
 
 

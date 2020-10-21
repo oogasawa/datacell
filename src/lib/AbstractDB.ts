@@ -23,8 +23,9 @@ export abstract class AbstractDB implements DataCellStore {
         this.nameConverter = new NameConverter();
     }
 
-
+    /** @inheritdoc */
     abstract close(): void;
+
 
 
     /** @inheritdoc */
