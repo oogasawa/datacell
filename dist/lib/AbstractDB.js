@@ -65,8 +65,26 @@ var AbstractDB = /** @class */ (function () {
         return this._deleteTable(tableName);
     };
     /** @inheritdoc */
-    AbstractDB.prototype.getAllTables = function () {
+    AbstractDB.prototype.deleteAllTables = function () {
         var e_1, _a;
+        var ts = this.getAllTables();
+        try {
+            for (var ts_1 = __values(ts), ts_1_1 = ts_1.next(); !ts_1_1.done; ts_1_1 = ts_1.next()) {
+                var t = ts_1_1.value;
+                this._deleteTable(t);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (ts_1_1 && !ts_1_1.done && (_a = ts_1.return)) _a.call(ts_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+    };
+    /** @inheritdoc */
+    AbstractDB.prototype.getAllTables = function () {
+        var e_2, _a;
         var result = [];
         var tables = this.getAllTablesIncludingManagementTables();
         try {
@@ -77,18 +95,18 @@ var AbstractDB = /** @class */ (function () {
                 }
             }
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
         finally {
             try {
                 if (tables_1_1 && !tables_1_1.done && (_a = tables_1.return)) _a.call(tables_1);
             }
-            finally { if (e_1) throw e_1.error; }
+            finally { if (e_2) throw e_2.error; }
         }
         return result;
     };
     /** @inheritdoc */
     AbstractDB.prototype.getAllCategories = function () {
-        var e_2, _a;
+        var e_3, _a;
         var result = [];
         var tset = new typescriptcollectionsframework_1.TreeSet(new datacell_collections_1.StringComparator());
         var tables = this.getAllTables();
@@ -103,12 +121,12 @@ var AbstractDB = /** @class */ (function () {
                 }
             }
         }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
         finally {
             try {
                 if (tables_2_1 && !tables_2_1.done && (_a = tables_2.return)) _a.call(tables_2);
             }
-            finally { if (e_2) throw e_2.error; }
+            finally { if (e_3) throw e_3.error; }
         }
         for (var iter = tset.iterator(); iter.hasNext();) {
             result.push(this.nameConverter.getOriginalName(iter.next()));
@@ -131,7 +149,7 @@ var AbstractDB = /** @class */ (function () {
     };
     /** @inheritdoc */
     AbstractDB.prototype.getAllPredicates = function (category) {
-        var e_3, _a;
+        var e_4, _a;
         var result = [];
         var tables = this.getAllTables();
         try {
@@ -145,12 +163,12 @@ var AbstractDB = /** @class */ (function () {
                 }
             }
         }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
         finally {
             try {
                 if (tables_3_1 && !tables_3_1.done && (_a = tables_3.return)) _a.call(tables_3);
             }
-            finally { if (e_3) throw e_3.error; }
+            finally { if (e_4) throw e_4.error; }
         }
         return result;
     };
@@ -250,7 +268,7 @@ var AbstractDB = /** @class */ (function () {
     // }
     /** @inheritdoc */
     AbstractDB.prototype.print = function () {
-        var e_4, _a, e_5, _b, e_6, _c, e_7, _d;
+        var e_5, _a, e_6, _b, e_7, _c, e_8, _d;
         var categories = this.getAllCategories().sort();
         try {
             // console.log("categories.length: " + categories.length);
@@ -259,58 +277,58 @@ var AbstractDB = /** @class */ (function () {
                 var ids = this._categoryToObjectIDs(c).sort();
                 try {
                     // console.log("  ids.length: " + ids.length);
-                    for (var ids_1 = (e_5 = void 0, __values(ids)), ids_1_1 = ids_1.next(); !ids_1_1.done; ids_1_1 = ids_1.next()) {
+                    for (var ids_1 = (e_6 = void 0, __values(ids)), ids_1_1 = ids_1.next(); !ids_1_1.done; ids_1_1 = ids_1.next()) {
                         var i = ids_1_1.value;
                         var preds = this._getPredicates(c, i).sort();
                         try {
                             // console.log("    preds.length: " + preds.length);
-                            for (var preds_1 = (e_6 = void 0, __values(preds)), preds_1_1 = preds_1.next(); !preds_1_1.done; preds_1_1 = preds_1.next()) {
+                            for (var preds_1 = (e_7 = void 0, __values(preds)), preds_1_1 = preds_1.next(); !preds_1_1.done; preds_1_1 = preds_1.next()) {
                                 var p = preds_1_1.value;
                                 var values = this.getValues(new DataCell_1.DataCell(c, i, p, ""));
                                 try {
                                     // console.log("    values.length: " + values.length);
-                                    for (var values_1 = (e_7 = void 0, __values(values)), values_1_1 = values_1.next(); !values_1_1.done; values_1_1 = values_1.next()) {
+                                    for (var values_1 = (e_8 = void 0, __values(values)), values_1_1 = values_1.next(); !values_1_1.done; values_1_1 = values_1.next()) {
                                         var v = values_1_1.value;
                                         console.log(c + "\t" + i + "\t" + p + "\t" + JSON.stringify(v));
                                     }
                                 }
-                                catch (e_7_1) { e_7 = { error: e_7_1 }; }
+                                catch (e_8_1) { e_8 = { error: e_8_1 }; }
                                 finally {
                                     try {
                                         if (values_1_1 && !values_1_1.done && (_d = values_1.return)) _d.call(values_1);
                                     }
-                                    finally { if (e_7) throw e_7.error; }
+                                    finally { if (e_8) throw e_8.error; }
                                 }
                             }
                         }
-                        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+                        catch (e_7_1) { e_7 = { error: e_7_1 }; }
                         finally {
                             try {
                                 if (preds_1_1 && !preds_1_1.done && (_c = preds_1.return)) _c.call(preds_1);
                             }
-                            finally { if (e_6) throw e_6.error; }
+                            finally { if (e_7) throw e_7.error; }
                         }
                     }
                 }
-                catch (e_5_1) { e_5 = { error: e_5_1 }; }
+                catch (e_6_1) { e_6 = { error: e_6_1 }; }
                 finally {
                     try {
                         if (ids_1_1 && !ids_1_1.done && (_b = ids_1.return)) _b.call(ids_1);
                     }
-                    finally { if (e_5) throw e_5.error; }
+                    finally { if (e_6) throw e_6.error; }
                 }
             }
         }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
         finally {
             try {
                 if (categories_1_1 && !categories_1_1.done && (_a = categories_1.return)) _a.call(categories_1);
             }
-            finally { if (e_4) throw e_4.error; }
+            finally { if (e_5) throw e_5.error; }
         }
     };
     AbstractDB.prototype._categoryToTables = function (category) {
-        var e_8, _a;
+        var e_9, _a;
         var result = [];
         var categoryInternalName = this.nameConverter._makeInternalName(category);
         var tables = this.getAllTables();
@@ -323,17 +341,17 @@ var AbstractDB = /** @class */ (function () {
                 }
             }
         }
-        catch (e_8_1) { e_8 = { error: e_8_1 }; }
+        catch (e_9_1) { e_9 = { error: e_9_1 }; }
         finally {
             try {
                 if (tables_4_1 && !tables_4_1.done && (_a = tables_4.return)) _a.call(tables_4);
             }
-            finally { if (e_8) throw e_8.error; }
+            finally { if (e_9) throw e_9.error; }
         }
         return result;
     };
     AbstractDB.prototype._tablesToPredicates = function (tableList) {
-        var e_9, _a;
+        var e_10, _a;
         var result = [];
         try {
             for (var tableList_1 = __values(tableList), tableList_1_1 = tableList_1.next(); !tableList_1_1.done; tableList_1_1 = tableList_1.next()) {
@@ -342,12 +360,12 @@ var AbstractDB = /** @class */ (function () {
                 result.push(this.nameConverter.getOriginalName(cps[1]));
             }
         }
-        catch (e_9_1) { e_9 = { error: e_9_1 }; }
+        catch (e_10_1) { e_10 = { error: e_10_1 }; }
         finally {
             try {
                 if (tableList_1_1 && !tableList_1_1.done && (_a = tableList_1.return)) _a.call(tableList_1);
             }
-            finally { if (e_9) throw e_9.error; }
+            finally { if (e_10) throw e_10.error; }
         }
         return result;
     };
