@@ -18,23 +18,55 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractDB = void 0;
-var typescriptcollectionsframework_1 = require("typescriptcollectionsframework");
 var DataCell_1 = require("./DataCell");
 var NameConverter_1 = require("./NameConverter");
-var datacell_collections_1 = require("datacell-collections");
+var streamlib = __importStar(require("datacell-streamlib"));
+var stream_1 = require("stream");
 var log4js = __importStar(require("log4js"));
 var logger = log4js.getLogger();
 logger.level = 'error';
@@ -48,100 +80,182 @@ var AbstractDB = /** @class */ (function () {
     };
     /** @inheritdoc */
     AbstractDB.prototype.createTable = function (cond) {
-        var tableName = this.nameConverter
-            .makeTableName(cond.category, cond.predicate);
-        return this._createTable(tableName);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter
+                            .makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._createTable(tableName)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.hasTable = function (cond) {
-        var tableName = this.nameConverter
-            .makeTableName(cond.category, cond.predicate);
-        return this._hasTable(tableName);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter
+                            .makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._hasTable(tableName)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.deleteTable = function (cond) {
-        var tableName = this.nameConverter
-            .makeTableName(cond.category, cond.predicate);
-        return this._deleteTable(tableName);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter
+                            .makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._deleteTable(tableName)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.deleteAllTables = function () {
         var e_1, _a;
-        var ts = this.getAllTables();
-        try {
-            for (var ts_1 = __values(ts), ts_1_1 = ts_1.next(); !ts_1_1.done; ts_1_1 = ts_1.next()) {
-                var t = ts_1_1.value;
-                this._deleteTable(t);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (ts_1_1 && !ts_1_1.done && (_a = ts_1.return)) _a.call(ts_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var r_stream, r_stream_1, r_stream_1_1, t, e_1_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, this.getAllTables()];
+                    case 1:
+                        r_stream = _b.sent();
+                        _b.label = 2;
+                    case 2:
+                        _b.trys.push([2, 8, 9, 14]);
+                        r_stream_1 = __asyncValues(r_stream);
+                        _b.label = 3;
+                    case 3: return [4 /*yield*/, r_stream_1.next()];
+                    case 4:
+                        if (!(r_stream_1_1 = _b.sent(), !r_stream_1_1.done)) return [3 /*break*/, 7];
+                        t = r_stream_1_1.value;
+                        return [4 /*yield*/, this._deleteTable(t)];
+                    case 5:
+                        _b.sent();
+                        _b.label = 6;
+                    case 6: return [3 /*break*/, 3];
+                    case 7: return [3 /*break*/, 14];
+                    case 8:
+                        e_1_1 = _b.sent();
+                        e_1 = { error: e_1_1 };
+                        return [3 /*break*/, 14];
+                    case 9:
+                        _b.trys.push([9, , 12, 13]);
+                        if (!(r_stream_1_1 && !r_stream_1_1.done && (_a = r_stream_1.return))) return [3 /*break*/, 11];
+                        return [4 /*yield*/, _a.call(r_stream_1)];
+                    case 10:
+                        _b.sent();
+                        _b.label = 11;
+                    case 11: return [3 /*break*/, 13];
+                    case 12:
+                        if (e_1) throw e_1.error;
+                        return [7 /*endfinally*/];
+                    case 13: return [7 /*endfinally*/];
+                    case 14: return [2 /*return*/];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.getAllTables = function () {
-        var e_2, _a;
-        var result = [];
-        var tables = this.getAllTablesIncludingManagementTables();
-        try {
-            for (var tables_1 = __values(tables), tables_1_1 = tables_1.next(); !tables_1_1.done; tables_1_1 = tables_1.next()) {
-                var t = tables_1_1.value;
-                if (!this._isManagementTable(t)) {
-                    result.push(t);
+        return __awaiter(this, void 0, void 0, function () {
+            var r_stream;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getAllTablesIncludingManagementTables()];
+                    case 1:
+                        r_stream = _a.sent();
+                        return [2 /*return*/, r_stream
+                                .pipe(new streamlib.Filter(function (elem) {
+                                return !_this._isManagementTable(elem);
+                            }))];
                 }
-            }
-        }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (tables_1_1 && !tables_1_1.done && (_a = tables_1.return)) _a.call(tables_1);
-            }
-            finally { if (e_2) throw e_2.error; }
-        }
-        return result;
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.getAllCategories = function () {
-        var e_3, _a;
-        var result = [];
-        var tset = new typescriptcollectionsframework_1.TreeSet(new datacell_collections_1.StringComparator());
-        var tables = this.getAllTables();
-        try {
-            // logger.debug("AbstractDB::getAllCategories: " + tables);
-            // unique the category names.
-            for (var tables_2 = __values(tables), tables_2_1 = tables_2.next(); !tables_2_1.done; tables_2_1 = tables_2.next()) {
-                var t = tables_2_1.value;
-                var names = this.nameConverter.parseTableName(t);
-                if (names.length === 2) {
-                    tset.add(names[0]);
+        return __awaiter(this, void 0, void 0, function () {
+            var r_stream;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getAllTables()];
+                    case 1:
+                        r_stream = _a.sent();
+                        return [2 /*return*/, r_stream
+                                // It shoule be noted that this pipe flows Promise<string> objects to the next pipe(),
+                                // because the map function is asynchronous.
+                                .pipe(new streamlib.Map(function (t) { return __awaiter(_this, void 0, void 0, function () {
+                                var names;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            names = this.nameConverter.parseTableName(t);
+                                            return [4 /*yield*/, this.nameConverter.getOriginalName(names[0])];
+                                        case 1: return [2 /*return*/, _a.sent()];
+                                    }
+                                });
+                            }); }))
+                                // Transform Promise<string> to string.
+                                .pipe(new stream_1.Transform({
+                                readableObjectMode: true,
+                                writableObjectMode: true,
+                                transform: function (chunk, encode, cb) {
+                                    return __awaiter(this, void 0, void 0, function () {
+                                        var _a;
+                                        return __generator(this, function (_b) {
+                                            switch (_b.label) {
+                                                case 0:
+                                                    _a = this.push;
+                                                    return [4 /*yield*/, chunk];
+                                                case 1:
+                                                    _a.apply(this, [_b.sent()]);
+                                                    cb();
+                                                    return [2 /*return*/];
+                                            }
+                                        });
+                                    });
+                                },
+                                flush: function (cb) {
+                                    cb();
+                                }
+                            }))
+                                .pipe(new streamlib.Unique())];
                 }
-            }
-        }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
-        finally {
-            try {
-                if (tables_2_1 && !tables_2_1.done && (_a = tables_2.return)) _a.call(tables_2);
-            }
-            finally { if (e_3) throw e_3.error; }
-        }
-        for (var iter = tset.iterator(); iter.hasNext();) {
-            result.push(this.nameConverter.getOriginalName(iter.next()));
-        }
-        return result;
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.getIDs = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getIDs(tableName);
-    };
-    /** @inheritdoc */
-    AbstractDB.prototype.getIDStream = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getIDStream(tableName);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [2 /*return*/, this._getIDs(tableName)];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.getPredicates = function (cond) {
@@ -149,58 +263,116 @@ var AbstractDB = /** @class */ (function () {
     };
     /** @inheritdoc */
     AbstractDB.prototype.getAllPredicates = function (category) {
-        var e_4, _a;
-        var result = [];
-        var tables = this.getAllTables();
-        try {
-            for (var tables_3 = __values(tables), tables_3_1 = tables_3.next(); !tables_3_1.done; tables_3_1 = tables_3.next()) {
-                var t = tables_3_1.value;
-                var names = this.nameConverter.parseTableName(t);
-                var cat = this.nameConverter.getOriginalName(names[0]);
-                var pred = this.nameConverter.getOriginalName(names[1]);
-                if (category === cat) {
-                    result.push(pred);
+        return __awaiter(this, void 0, void 0, function () {
+            var r_stream;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getAllTables()];
+                    case 1:
+                        r_stream = _a.sent();
+                        return [2 /*return*/, r_stream
+                                .pipe(new streamlib.Filter(function (t) { return __awaiter(_this, void 0, void 0, function () {
+                                var names, cat;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            names = this.nameConverter.parseTableName(t);
+                                            return [4 /*yield*/, this.nameConverter.getOriginalName(names[0])];
+                                        case 1:
+                                            cat = _a.sent();
+                                            return [2 /*return*/, category === cat];
+                                    }
+                                });
+                            }); }))
+                                .pipe(new streamlib.Map(function (t) { return __awaiter(_this, void 0, void 0, function () {
+                                var names, pred;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            names = this.nameConverter.parseTableName(t);
+                                            return [4 /*yield*/, this.nameConverter.getOriginalName(names[1])];
+                                        case 1:
+                                            pred = _a.sent();
+                                            return [2 /*return*/, pred];
+                                    }
+                                });
+                            }); }))];
                 }
-            }
-        }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
-        finally {
-            try {
-                if (tables_3_1 && !tables_3_1.done && (_a = tables_3.return)) _a.call(tables_3);
-            }
-            finally { if (e_4) throw e_4.error; }
-        }
-        return result;
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.getValues = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getValues(tableName, cond.objectId);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [2 /*return*/, this._getValues(tableName, cond.objectId)];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.getRows = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getRows(tableName, cond.objectId);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [2 /*return*/, this._getRows(tableName, cond.objectId)];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.getAllRows = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getAllRows(tableName);
-    };
-    /** @inheritdoc */
-    AbstractDB.prototype.getStreamOfAllRows = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getStreamOfAllRows(tableName);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [2 /*return*/, this._getAllRows(tableName)];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.hasID = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._hasID(tableName, cond.objectId);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._hasID(tableName, cond.objectId)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.hasRow = function (cond) {
-        var tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._hasRow(tableName, cond.objectId, cond.value);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._hasRow(tableName, cond.objectId, cond.value)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype._compareObjectValues = function (obj1, obj2) {
@@ -210,164 +382,208 @@ var AbstractDB = /** @class */ (function () {
     };
     /** @inheritdoc */
     AbstractDB.prototype.addRow = function (cell) {
-        var tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._addRow(tableName, cell.objectId, cell.value);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cell.category, cell.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._addRow(tableName, cell.objectId, cell.value)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype._putRow = function (tableName, objectID, value) {
-        if (!this._hasTable(tableName)) {
-            this._createTable(tableName);
-        }
-        this._addRow(tableName, objectID, value);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._hasTable(tableName)];
+                    case 1:
+                        if (!!(_a.sent())) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this._createTable(tableName)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, this._addRow(tableName, objectID, value)];
+                    case 4:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.putRow = function (cell) {
-        var tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._putRow(tableName, cell.objectId, cell.value);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cell.category, cell.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._putRow(tableName, cell.objectId, cell.value)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype._putRowIfKeyValuePairIsAbsent = function (tableName, objectID, value) {
-        if (!this._hasTable(tableName)) {
-            this._createTable(tableName);
-        }
-        this._addRow(tableName, objectID, value);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._hasTable(tableName)];
+                    case 1:
+                        if (!!(_a.sent())) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this._createTable(tableName)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, this._addRow(tableName, objectID, value)];
+                    case 4:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.putRowIfKeyValuePairIsAbsent = function (cell) {
-        var tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._putRowIfKeyValuePairIsAbsent(tableName, cell.objectId, cell.value);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cell.category, cell.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._putRowIfKeyValuePairIsAbsent(tableName, cell.objectId, cell.value)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype._putRowIfKeyIsAbsent = function (tableName, objectID, value) {
-        if (!this._hasTable(tableName)) {
-            this._createTable(tableName);
-        }
-        if (!this._hasID(tableName, objectID)) {
-            this._addRow(tableName, objectID, value);
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._hasTable(tableName)];
+                    case 1:
+                        if (!!(_a.sent())) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this._createTable(tableName)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, this._hasID(tableName, objectID)];
+                    case 4:
+                        if (!!(_a.sent())) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this._addRow(tableName, objectID, value)];
+                    case 5:
+                        _a.sent();
+                        _a.label = 6;
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.putRowIfKeyIsAbsent = function (cell) {
-        var tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._putRowIfKeyIsAbsent(tableName, cell.objectId, cell.value);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cell.category, cell.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._putRowIfKeyIsAbsent(tableName, cell.objectId, cell.value)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype.putRowWithReplacingValue = function (cell) {
-        var tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._putRowWithReplacingValue(tableName, cell.objectId, cell.value);
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cell.category, cell.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._putRowWithReplacingValue(tableName, cell.objectId, cell.value)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
-    // writeToFile(fname: string, tableName?: string): Promise<void> {
-    //     if (tableName !== null) {
-    //         this._writeToFile(fname, tableName);
-    //     }
-    //     else {
-    //         for (let t of this.getAllTables()) {
-    //             this._writeToFile(fname, t);
-    //         }
-    //     }
-    // }
     /** @inheritdoc */
     AbstractDB.prototype.print = function () {
-        var e_5, _a, e_6, _b, e_7, _c, e_8, _d;
-        var categories = this.getAllCategories().sort();
-        try {
-            // console.log("categories.length: " + categories.length);
-            for (var categories_1 = __values(categories), categories_1_1 = categories_1.next(); !categories_1_1.done; categories_1_1 = categories_1.next()) {
-                var c = categories_1_1.value;
-                var ids = this._categoryToObjectIDs(c).sort();
-                try {
-                    // console.log("  ids.length: " + ids.length);
-                    for (var ids_1 = (e_6 = void 0, __values(ids)), ids_1_1 = ids_1.next(); !ids_1_1.done; ids_1_1 = ids_1.next()) {
-                        var i = ids_1_1.value;
-                        var preds = this._getPredicates(c, i).sort();
-                        try {
-                            // console.log("    preds.length: " + preds.length);
-                            for (var preds_1 = (e_7 = void 0, __values(preds)), preds_1_1 = preds_1.next(); !preds_1_1.done; preds_1_1 = preds_1.next()) {
-                                var p = preds_1_1.value;
-                                var values = this.getValues(new DataCell_1.DataCell(c, i, p, ""));
-                                try {
-                                    // console.log("    values.length: " + values.length);
-                                    for (var values_1 = (e_8 = void 0, __values(values)), values_1_1 = values_1.next(); !values_1_1.done; values_1_1 = values_1.next()) {
-                                        var v = values_1_1.value;
-                                        console.log(c + "\t" + i + "\t" + p + "\t" + JSON.stringify(v));
-                                    }
+        return __awaiter(this, void 0, void 0, function () {
+            var r_stream;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getAllCategories()];
+                    case 1:
+                        r_stream = _a.sent();
+                        r_stream
+                            .pipe(new streamlib.Sort())
+                            .pipe(new streamlib.Map(function (category) { return __awaiter(_this, void 0, void 0, function () {
+                            var r_stream1;
+                            var _this = this;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, this._categoryToObjectIDs(category)];
+                                    case 1:
+                                        r_stream1 = _a.sent();
+                                        r_stream1
+                                            .pipe(new streamlib.Sort())
+                                            .pipe(new streamlib.Map(function (id) { return __awaiter(_this, void 0, void 0, function () {
+                                            var r_stream2;
+                                            var _this = this;
+                                            return __generator(this, function (_a) {
+                                                switch (_a.label) {
+                                                    case 0: return [4 /*yield*/, this._getPredicates(category, id)];
+                                                    case 1:
+                                                        r_stream2 = _a.sent();
+                                                        r_stream2
+                                                            .pipe(new streamlib.Sort())
+                                                            .pipe(new streamlib.Map(function (pred) { return __awaiter(_this, void 0, void 0, function () {
+                                                            var r_stream3;
+                                                            return __generator(this, function (_a) {
+                                                                switch (_a.label) {
+                                                                    case 0: return [4 /*yield*/, this.getValues(new DataCell_1.DataCell(category, id, pred, ""))];
+                                                                    case 1:
+                                                                        r_stream3 = _a.sent();
+                                                                        r_stream3
+                                                                            .pipe(new streamlib.Sort())
+                                                                            .pipe(new streamlib.Map(function (value) {
+                                                                            var row = [category,
+                                                                                id,
+                                                                                pred,
+                                                                                JSON.stringify(value)];
+                                                                            console.log(row.join("\t"));
+                                                                            return value;
+                                                                        }));
+                                                                        return [2 /*return*/, pred];
+                                                                }
+                                                            });
+                                                        }); }));
+                                                        return [2 /*return*/, id];
+                                                }
+                                            });
+                                        }); }));
+                                        return [2 /*return*/, category];
                                 }
-                                catch (e_8_1) { e_8 = { error: e_8_1 }; }
-                                finally {
-                                    try {
-                                        if (values_1_1 && !values_1_1.done && (_d = values_1.return)) _d.call(values_1);
-                                    }
-                                    finally { if (e_8) throw e_8.error; }
-                                }
-                            }
-                        }
-                        catch (e_7_1) { e_7 = { error: e_7_1 }; }
-                        finally {
-                            try {
-                                if (preds_1_1 && !preds_1_1.done && (_c = preds_1.return)) _c.call(preds_1);
-                            }
-                            finally { if (e_7) throw e_7.error; }
-                        }
-                    }
+                            });
+                        }); }));
+                        return [2 /*return*/];
                 }
-                catch (e_6_1) { e_6 = { error: e_6_1 }; }
-                finally {
-                    try {
-                        if (ids_1_1 && !ids_1_1.done && (_b = ids_1.return)) _b.call(ids_1);
-                    }
-                    finally { if (e_6) throw e_6.error; }
-                }
-            }
-        }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
-        finally {
-            try {
-                if (categories_1_1 && !categories_1_1.done && (_a = categories_1.return)) _a.call(categories_1);
-            }
-            finally { if (e_5) throw e_5.error; }
-        }
-    };
-    AbstractDB.prototype._categoryToTables = function (category) {
-        var e_9, _a;
-        var result = [];
-        var categoryInternalName = this.nameConverter._makeInternalName(category);
-        var tables = this.getAllTables();
-        try {
-            for (var tables_4 = __values(tables), tables_4_1 = tables_4.next(); !tables_4_1.done; tables_4_1 = tables_4.next()) {
-                var t = tables_4_1.value;
-                var cps = this.nameConverter.parseTableName(t);
-                if (cps[0] === categoryInternalName) {
-                    result.push(t);
-                }
-            }
-        }
-        catch (e_9_1) { e_9 = { error: e_9_1 }; }
-        finally {
-            try {
-                if (tables_4_1 && !tables_4_1.done && (_a = tables_4.return)) _a.call(tables_4);
-            }
-            finally { if (e_9) throw e_9.error; }
-        }
-        return result;
-    };
-    AbstractDB.prototype._tablesToPredicates = function (tableList) {
-        var e_10, _a;
-        var result = [];
-        try {
-            for (var tableList_1 = __values(tableList), tableList_1_1 = tableList_1.next(); !tableList_1_1.done; tableList_1_1 = tableList_1.next()) {
-                var t = tableList_1_1.value;
-                var cps = this.nameConverter.parseTableName(t);
-                result.push(this.nameConverter.getOriginalName(cps[1]));
-            }
-        }
-        catch (e_10_1) { e_10 = { error: e_10_1 }; }
-        finally {
-            try {
-                if (tableList_1_1 && !tableList_1_1.done && (_a = tableList_1.return)) _a.call(tableList_1);
-            }
-            finally { if (e_10) throw e_10.error; }
-        }
-        return result;
+            });
+        });
     };
     /** @inheritdoc */
     AbstractDB.prototype._isManagementTable = function (tableName) {

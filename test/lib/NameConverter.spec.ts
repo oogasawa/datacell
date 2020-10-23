@@ -6,52 +6,68 @@ import { NameConverter } from "../../src/lib/NameConverter";
 import { MemDB } from "../../src/lib/MemDB";
 // import { DataCellStore } from "../../src/libs/DataCellStore";
 
+import * as log4js from "log4js";
+const logger = log4js.getLogger();
+logger.level = "error";
+
+
 
 describe('NameConverter', () => {
 
     context("constructor", () => {
-        it('should be able to construct with MemDB.', () => {
+        it('should be able to construct with MemDB.', async () => {
+
+            //logger.level = "debug";
+
             const nc = new NameConverter();
             nc.init(new MemDB());
-            const result = nc.hasOriginalName("dummy");
+            const result: boolean = await nc.hasOriginalName("dummy");
             expect(result).to.equal(false);
+
+            // logger.level = "error";
         });
     });
 
 
     context("_makeInternalName", () => {
-        it('should return upper case string of origName when origName matches the alnum pattern.', () => {
+        it('should return upper case string of origName when origName matches the alnum pattern.', async () => {
             const nc = new NameConverter();
             nc.init(new MemDB());
-            const result = nc._makeInternalName("alnum");
+            const result: string = await nc._makeInternalName("alnum");
             expect(result).to.equal("ALNUM");
         });
 
-        it('should connect words with underscores.', () => {
+        it('should connect words with underscores.', async () => {
             const nc = new NameConverter();
             nc.init(new MemDB());
-            let result = nc._makeInternalName("alnum abc");
+            let result: string = await nc._makeInternalName("alnum abc");
             expect(result).to.equal("ALNUM_ABC");
 
-            result = nc._makeInternalName("alnum abc def");
+            result = await nc._makeInternalName("alnum abc def");
             expect(result).to.equal("ALNUM_ABC_DEF");
         });
 
-        it('should truncate string when the origName is too long.', () => {
+        it('should truncate string when the origName is too long.', async () => {
+
+            // logger.level = "debug";
+
             const nc = new NameConverter();
             nc.init(new MemDB());
-            const result = nc._makeInternalName("this is an example of the original name which is too long");
+            const result: string = await nc._makeInternalName("this is an example of the original name which is too long");
             expect(result).to.equal("THIS_IS_AN_EXAMPLE_O00001");
+
+            // logger.level = "error";
+
         });
 
 
-        it('should prefixed alnum when origName contains non-alnum characters.', () => {
+        it('should prefixed alnum when origName contains non-alnum characters.', async () => {
             const nc = new NameConverter();
             nc.init(new MemDB());
-            let result = nc._makeInternalName("including@nonalnum");
+            let result: string = await nc._makeInternalName("including@nonalnum");
             expect(result).to.equal("NONALNUM00001");
 
-            result = nc._makeInternalName("別の例");
+            result = await nc._makeInternalName("別の例");
             expect(result).to.equal("NONALNUM00002");
 
         });
@@ -61,7 +77,7 @@ describe('NameConverter', () => {
 
 
     context("getInternalName", () => {
-        it('should return internal name corresponds to the given original name.', () => {
+        it('should return internal name corresponds to the given original name.', async () => {
             const nc = new NameConverter();
             nc.init(new MemDB());
 
@@ -69,25 +85,25 @@ describe('NameConverter', () => {
                 "an too long name which should be prefixed",
                 "日本語"]
             const intlNames: string[] = [];
-            intlNames.push(nc._makeInternalName(origNames[0]));
-            intlNames.push(nc._makeInternalName(origNames[1]));
-            intlNames.push(nc._makeInternalName(origNames[2]));
+            intlNames.push(await nc._makeInternalName(origNames[0]));
+            intlNames.push(await nc._makeInternalName(origNames[1]));
+            intlNames.push(await nc._makeInternalName(origNames[2]));
 
-            nc.setInternalName(origNames[0], intlNames[0]);
-            nc.setInternalName(origNames[1], intlNames[1]);
-            nc.setInternalName(origNames[2], intlNames[2]);
+            await nc.setInternalName(origNames[0], intlNames[0]);
+            await nc.setInternalName(origNames[1], intlNames[1]);
+            await nc.setInternalName(origNames[2], intlNames[2]);
 
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[0]));
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[1]));
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[2]));
 
-            let result = nc.getInternalName(origNames[0]);
+            let result: string = await nc.getInternalName(origNames[0]);
             expect(result).to.equal(intlNames[0]);
 
-            result = nc.getInternalName(origNames[1]);
+            result = await nc.getInternalName(origNames[1]);
             expect(result).to.equal(intlNames[1]);
 
-            result = nc.getInternalName(origNames[2]);
+            result = await nc.getInternalName(origNames[2]);
             expect(result).to.equal(intlNames[2]);
 
         });
@@ -95,7 +111,7 @@ describe('NameConverter', () => {
 
 
     context("getOriginalName", () => {
-        it('should return original name corresponds to the given internal name.', () => {
+        it('should return original name corresponds to the given internal name.', async () => {
             const nc = new NameConverter();
             nc.init(new MemDB());
 
@@ -103,25 +119,25 @@ describe('NameConverter', () => {
                 "an too long name which should be prefixed",
                 "日本語"]
             const intlNames: string[] = [];
-            intlNames.push(nc._makeInternalName(origNames[0]));
-            intlNames.push(nc._makeInternalName(origNames[1]));
-            intlNames.push(nc._makeInternalName(origNames[2]));
+            intlNames.push(await nc._makeInternalName(origNames[0]));
+            intlNames.push(await nc._makeInternalName(origNames[1]));
+            intlNames.push(await nc._makeInternalName(origNames[2]));
 
-            nc.setInternalName(origNames[0], intlNames[0]);
-            nc.setInternalName(origNames[1], intlNames[1]);
-            nc.setInternalName(origNames[2], intlNames[2]);
+            await nc.setInternalName(origNames[0], intlNames[0]);
+            await nc.setInternalName(origNames[1], intlNames[1]);
+            await nc.setInternalName(origNames[2], intlNames[2]);
 
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[0]));
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[1]));
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[2]));
 
-            let result = nc.getOriginalName(intlNames[0]);
+            let result: string = await nc.getOriginalName(intlNames[0]);
             expect(result).to.equal(origNames[0]);
 
-            result = nc.getOriginalName(intlNames[1]);
+            result = await nc.getOriginalName(intlNames[1]);
             expect(result).to.equal(origNames[1]);
 
-            result = nc.getOriginalName(intlNames[2]);
+            result = await nc.getOriginalName(intlNames[2]);
             expect(result).to.equal(origNames[2]);
 
         });
@@ -129,10 +145,10 @@ describe('NameConverter', () => {
 
 
     context("makeTableName", () => {
-        it('should return table name that consists of a pair of two internal names.', () => {
+        it('should return table name that consists of a pair of two internal names.', async () => {
             const nc = new NameConverter();
             nc.init(new MemDB());
-            const result = nc.makeTableName("actor topic", "a too long name which should be prefixed");
+            const result: string = await nc.makeTableName("actor topic", "a too long name which should be prefixed");
 
             expect(result).to.equal("ACTOR_TOPIC__A_TOO_LONG_NAME_WHIC00001");
         });
@@ -141,7 +157,8 @@ describe('NameConverter', () => {
 
 
     context("hasOriginalName", () => {
-        it('should return true or false depending on whether the original name is stored or not.', () => {
+        it('should return true or false depending on whether the original name is stored or not.', async () => {
+
             const nc = new NameConverter();
             nc.init(new MemDB());
 
@@ -149,23 +166,25 @@ describe('NameConverter', () => {
                 "an too long name which should be prefixed",
                 "日本語"]
             const intlNames: string[] = [];
-            intlNames.push(nc._makeInternalName(origNames[0]));
-            intlNames.push(nc._makeInternalName(origNames[1]));
-            intlNames.push(nc._makeInternalName(origNames[2]));
+            intlNames.push(await nc._makeInternalName(origNames[0]));
+            intlNames.push(await nc._makeInternalName(origNames[1]));
+            intlNames.push(await nc._makeInternalName(origNames[2]));
 
-            nc.setInternalName(origNames[0], intlNames[0]);
-            nc.setInternalName(origNames[1], intlNames[1]);
-            nc.setInternalName(origNames[2], intlNames[2]);
+            await nc.setInternalName(origNames[0], intlNames[0]);
+            await nc.setInternalName(origNames[1], intlNames[1]);
+            await nc.setInternalName(origNames[2], intlNames[2]);
 
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[0]));
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[1]));
             // console.log(nc.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origNames[2]));
 
-            let result = nc.hasOriginalName(intlNames[0]);
+            let result: boolean = await nc.hasOriginalName(intlNames[0]);
             expect(result).to.equal(true);
 
-            result = nc.hasOriginalName("UNKNOWN_INTL_NAME");
+            result = await nc.hasOriginalName("UNKNOWN_INTL_NAME");
             expect(result).to.equal(false);
+
+
         });
     });
 

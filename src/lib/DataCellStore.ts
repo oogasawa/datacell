@@ -10,54 +10,54 @@ export interface DataCellStore {
 	/** Close connection to the DataCellStore.
 	 *
 	 */
-    close(): void;
+    close(): Promise<void>;
 
 
     getNameConverter(): NameConverter;
 
 
-    _createTable(tableName: string): string;
+    _createTable(tableName: string): Promise<string>;
 
 
-    createTable(cond: DataCell): string;
+    createTable(cond: DataCell): Promise<string>;
 
 
-    _hasTable(tableName: string): boolean;
+    _hasTable(tableName: string): Promise<boolean>;
 
 
-    hasTable(cond: DataCell): boolean;
-
-
-
-    _deleteTable(tableName: string): string;
-
-
-    deleteTable(cond: DataCell): string;
+    hasTable(cond: DataCell): Promise<boolean>;
 
 
 
-    deleteAllTables(): void;
+    _deleteTable(tableName: string): Promise<string>;
+
+
+    deleteTable(cond: DataCell): Promise<string>;
+
+
+
+    deleteAllTables(): Promise<void>;
 
 
 	/** Returns the names of all tables.
 	 * (The management tables are excluded.)
 	 */
-    getAllTables(): string[];
+    getAllTables(): Promise<Readable>;
 
 
-    getAllTablesIncludingManagementTables(): string[];
+    getAllTablesIncludingManagementTables(): Promise<Readable>;
 
 	/** Returns the names of all categories.
 	 * (The management tables are excluded.)
 	 */
-    getAllCategories(): string[];
+    getAllCategories(): Promise<Readable>;
 
 
 	/** Returns a list of all objectIDs in a given table.
 	 *
 	 * @param tableName
 	 */
-    _getIDs(tableName: string): string[];
+    _getIDs(tableName: string): Promise<Readable>;
 
 
 	/** Returns a list of all objectIDs in a given category / predicate pair.
@@ -67,24 +67,8 @@ export interface DataCellStore {
 	 *
 	 * @param cond - A data cell which represents a search condition.
 	 */
-    getIDs(cond: DataCell): string[];
+    getIDs(cond: DataCell): Promise<Readable>;
 
-
-	/** Returns a Readable stream of all objectIDs in a given table.
-	 *
-	 * @param tableName
-	 */
-    _getIDStream(tableName: string): Readable;
-
-
-	/** Returns a Readable stream of all objectIDs in a given category / predicate pair.
-	 *
-	 * <code>cond.category</code> and <code>cond.predicate</code> will be used for the search condition.
-	 * other properties (that is, <code>cond.objectID</code> and <code>cond.value</code> are ignored.
-	 *
-	 * @param cond - A data cell which represents a search condition.
-	 */
-    getIDStream(cond: DataCell): Readable;
 
 
 
@@ -95,7 +79,7 @@ export interface DataCellStore {
 	 * @param category
 	 * @param objectID
 	 */
-    _getPredicates(category: string, objectID: string): string[];
+    _getPredicates(category: string, objectID: string): Promise<Readable>;
 
 
 	/** Returns a list of predicates corresponding to a given objectID.
@@ -104,14 +88,14 @@ export interface DataCellStore {
 	 * other properties are ignored.
 	 * @param objectID
 	 */
-    getPredicates(cond: DataCell): string[];
+    getPredicates(cond: DataCell): Promise<Readable>;
 
 
 	/** Returns all predicates exists in a category.
 	 *
 	 * @param category
 	 */
-    getAllPredicates(category: string): string[];
+    getAllPredicates(category: string): Promise<Readable>;
 
 
 
@@ -125,36 +109,39 @@ export interface DataCellStore {
 	 * If the given table does not exist, or the given objectID is not in the table, 
 	 * this method returns an empty array, <code>[]</code>
 	 */
-    _getValues(tableName: string, objectID: string): string[];
+    _getValues(tableName: string, objectID: string): Promise<Readable>;
 
 
 	/** Gets values specified by category, objectID, and predicate.
 	 *
 	 * @param cond
 	 */
-    getValues(cond: DataCell): string[];
+    getValues(cond: DataCell): Promise<Readable>;
 
 
 	/** Gets a list of data cells specified by a tableName and objectID.
 	 *
 	 * @param tableName
 	 * @param objectID
+	 * @return Readable stream of DataCell objects.
 	 */
-    _getRows(tableName: string, objectID: string): DataCell[];
+    _getRows(tableName: string, objectID: string): Promise<Readable>; // DataCell[];
 
 
 	/** Gets a list of data cells specified by category, objectID and predicate.
 	 *
 	 * @param cond
+	 * @return Readable stream of DataCell objects.
 	 */
-    getRows(cond: DataCell): DataCell[];
+    getRows(cond: DataCell): Promise<Readable>; // DataCell[];
 
 
 	/** Returns an array of all data cells which is stored in a given table.
 	 *
 	 * @param tableName
+	 * @return Readable stream of DataCell objects.
 	 */
-    _getAllRows(tableName: string): DataCell[];
+    _getAllRows(tableName: string): Promise<Readable>; // DataCell[];
 
 
 
@@ -162,25 +149,9 @@ export interface DataCellStore {
 	 *
 	 * @param tableName
 	 * @param objectID
+	 * @return Readable stream of DataCell objects.
 	 */
-    getAllRows(cond: DataCell): DataCell[];
-
-
-
-	/** Returns a Readable stream of DataCell objects in a given table.
-	 *
-	 * @param tableName
-	 */
-    _getStreamOfAllRows(tableName: string, objectID: string): Readable;
-
-
-
-	/** Returns a Readable stream of DataCell objects in a given table.
-	 * 
-	 *
-	 * @param cond Condition that specifies a table. category and predicate in the given DataCell is used. 
-	 */
-    getStreamOfAllRows(cond: DataCell): Readable;
+    getAllRows(cond: DataCell): Promise<Readable>; // DataCell[];
 
 
 
@@ -190,7 +161,7 @@ export interface DataCellStore {
 	 * @param tableName
 	 * @param objectID
 	 */
-    _hasID(tableName: string, objectID: string): boolean;
+    _hasID(tableName: string, objectID: string): Promise<boolean>;
 
 
 
@@ -198,7 +169,7 @@ export interface DataCellStore {
 	 *
 	 * @param cond
 	 */
-    hasID(cond: DataCell): boolean;
+    hasID(cond: DataCell): Promise<boolean>;
 
 
 	/** Tests whether a given objectID / value pair exists or not in a given table.
@@ -207,14 +178,14 @@ export interface DataCellStore {
 	 * @param objectID
 	 * @param value
 	 */
-    _hasRow(tableName: string, objectID: string, value: any): boolean;
+    _hasRow(tableName: string, objectID: string, value: any): Promise<boolean>;
 
 
 	/** Tests whether a given objectID / value pair exists or not in a given table (category / predicate pair).
 	 *
 	 * @param cond
 	 */
-    hasRow(cond: DataCell): boolean;
+    hasRow(cond: DataCell): Promise<boolean>;
 
 
 	/** Add a datacell in the data store.
@@ -225,7 +196,7 @@ export interface DataCellStore {
 	 * @param objectID
 	 * @param value
 	 */
-    _addRow(tableName: string, objectID: string, value: any): void;
+    _addRow(tableName: string, objectID: string, value: any): Promise<void>;
 
 
 	/** Add a datacell in the data store.
@@ -234,7 +205,7 @@ export interface DataCellStore {
 	 *
 	 * @param cell
 	 */
-    addRow(cell: DataCell): void;
+    addRow(cell: DataCell): Promise<void>;
 
 
 	/** Add a data cell in the data store.
@@ -245,7 +216,7 @@ export interface DataCellStore {
 	 * @param objectID
 	 * @param value
 	 */
-    _putRow(tableName: string, objectID: string, value: any): void;
+    _putRow(tableName: string, objectID: string, value: any): Promise<void>;
 
 
 	/** Add a data cell in the data store.
@@ -254,28 +225,28 @@ export interface DataCellStore {
 	 *
 	 * @param cell
 	 */
-    putRow(cell: DataCell): void;
+    putRow(cell: DataCell): Promise<void>;
 
 
-    _putRowIfKeyValuePairIsAbsent(tableName: string, objectID: string, value: any): void;
+    _putRowIfKeyValuePairIsAbsent(tableName: string, objectID: string, value: any): Promise<void>;
 
 
-    putRowIfKeyValuePairIsAbsent(cell: DataCell): void;
+    putRowIfKeyValuePairIsAbsent(cell: DataCell): Promise<void>;
 
 
-    _putRowIfKeyIsAbsent(tableName: string, objectID: string, value: any): void;
+    _putRowIfKeyIsAbsent(tableName: string, objectID: string, value: any): Promise<void>;
 
 
-    putRowIfKeyIsAbsent(cell: DataCell): void;
+    putRowIfKeyIsAbsent(cell: DataCell): Promise<void>;
 
 
-    _putRowWithReplacingValue(tableName: string, objectID: string, value: any): void;
+    _putRowWithReplacingValue(tableName: string, objectID: string, value: any): Promise<void>;
 
 
-    putRowWithReplacingValue(cell: DataCell): void;
+    putRowWithReplacingValue(cell: DataCell): Promise<void>;
 
 
-    deleteRow(cond: DataCell): void;
+    deleteRow(cond: DataCell): Promise<void>;
 
 
     _isManagementTable(tableName: string): boolean;
@@ -284,7 +255,7 @@ export interface DataCellStore {
     getManagementTableNames(): string[];
 
 
-    print(): void;
+    print(): Promise<void>;
 
 
 }

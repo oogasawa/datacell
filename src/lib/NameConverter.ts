@@ -1,7 +1,10 @@
 
 import { sprintf } from "sprintf-js";
 import { DataCellStore } from "./DataCellStore";
+import * as streamlib from "datacell-streamlib";
 
+import * as log4js from "log4js";
+const logger = log4js.getLogger();
 
 
 export class NameConverter {
@@ -52,11 +55,11 @@ export class NameConverter {
 	 *
 	 * @param store
 	 */
-    setDataCellStore(store: DataCellStore) {
+    async setDataCellStore(store: DataCellStore): Promise<void> {
         this.store = store;
-        this.store._createTable("ORIGINAL_NAME__INTERNAL_NAME");
-        this.store._createTable("INTERNAL_NAME__ORIGINAL_NAME");
-        this.store._createTable("INTERNAL_NAME__MAX_COUNT");
+        await this.store._createTable("ORIGINAL_NAME__INTERNAL_NAME");
+        await this.store._createTable("INTERNAL_NAME__ORIGINAL_NAME");
+        await this.store._createTable("INTERNAL_NAME__MAX_COUNT");
     }
 
 
@@ -66,9 +69,10 @@ export class NameConverter {
 	 * @category Store Access
 	 * @param internalName
 	 */
-    hasOriginalName(internalName: string): boolean {
-        const result: any[] = this.store
-            ._getValues("INTERNAL_NAME__ORIGINAL_NAME", internalName);
+    async hasOriginalName(internalName: string): Promise<boolean> {
+        const result: string[]
+            = await streamlib.streamToArray(
+                await this.store._getValues("INTERNAL_NAME__ORIGINAL_NAME", internalName));
 
         return result.length > 0;
     }
@@ -79,9 +83,10 @@ export class NameConverter {
 	 * @category Store Access
 	 * @param internalName
 	 */
-    getOriginalName(internalName: string): string {
-        const result: any[] = this.store
-            ._getValues("INTERNAL_NAME__ORIGINAL_NAME", internalName);
+    async getOriginalName(internalName: string): Promise<string> {
+        const result: string[]
+            = await streamlib.streamToArray(
+                await this.store._getValues("INTERNAL_NAME__ORIGINAL_NAME", internalName));
 
         return result[0];
     }
@@ -98,15 +103,19 @@ export class NameConverter {
 	 * @param origName  - an original name.
 	 * @return internal name.
 	 */
-    getInternalName(origName: string): string {
+    async getInternalName(origName: string): Promise<string> {
 
-        const result: string[] = this.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origName);
+        const result: string[]
+            = await streamlib.streamToArray(
+                await this.store._getValues("ORIGINAL_NAME__INTERNAL_NAME", origName));
+
         if (result.length >= 1) {
             return result[0];
         }
         else {
-            const internalName = this._makeInternalName(origName);
-            this.setInternalName(origName, internalName);
+            const internalName: string
+                = await this._makeInternalName(origName);
+            await this.setInternalName(origName, internalName);
             return internalName;
         }
 
@@ -119,9 +128,9 @@ export class NameConverter {
 	 * @param origName
 	 * @param internalName
 	 */
-    setInternalName(origName: string, internalName: string): void {
-        this.store._putRowWithReplacingValue("INTERNAL_NAME__ORIGINAL_NAME", internalName, origName);
-        this.store._putRowWithReplacingValue("ORIGINAL_NAME__INTERNAL_NAME", origName, internalName);
+    async setInternalName(origName: string, internalName: string): Promise<void> {
+        await this.store._putRowWithReplacingValue("INTERNAL_NAME__ORIGINAL_NAME", internalName, origName);
+        await this.store._putRowWithReplacingValue("ORIGINAL_NAME__INTERNAL_NAME", origName, internalName);
     }
 
 
@@ -134,7 +143,7 @@ export class NameConverter {
 	 * @param origName - an original name.
 	 * @return generated internal name
 	 */
-    _makeInternalName(origName: string): string {
+    async _makeInternalName(origName: string): Promise<string> {
 
         let internalName: string;
         let prefix: string;
@@ -148,17 +157,20 @@ export class NameConverter {
             else {
                 prefix = origName.substring(0, this.MAX_LENGTH_OF_PREFIX);
                 prefix = prefix.split(" ").join("_").toUpperCase(); // replace all " " with "_".
-                counter = this.getCount(prefix);
+                counter = await this.getCount(prefix);
                 internalName = prefix + sprintf("%0" + this.NUMBER_OF_DIGITS + "d", ++counter);
-                this.setCount(prefix, counter);
+                await this.setCount(prefix, counter);
             }
         }
         else { // do not match the alnum pattern.
             prefix = this.NAME_PREFIX;
-            counter = this.getCount(prefix);
+            counter = await this.getCount(prefix);
             internalName = prefix + sprintf("%0" + this.NUMBER_OF_DIGITS + "d", ++counter);
-            this.setCount(prefix, counter);
+            await this.setCount(prefix, counter);
         }
+
+        logger.debug("NameConverter::_makeInternalName() : origName = " + origName);
+        logger.debug("NameConverter::_makeInternalName() : internalName = " + internalName);
 
         return internalName;
     }
@@ -169,9 +181,12 @@ export class NameConverter {
 	 * @category Store Access
 	 * @param prefix
 	 */
-    getCount(prefix: string): number {
+    async getCount(prefix: string): Promise<number> {
         let count = 0;
-        const cList: any[] = this.store._getValues("INTERNAL_NAME_PREFIX__MAX_COUNT", prefix);
+        const cList: string[]
+            = await streamlib.streamToArray(
+                await this.store._getValues("INTERNAL_NAME_PREFIX__MAX_COUNT", prefix));
+
         if (cList.length > 0) {
             count = parseInt(cList[0], 10);
         }
@@ -186,8 +201,8 @@ export class NameConverter {
 	 * @param prefix
 	 * @param count
 	 */
-    setCount(prefix: string, count: number): void {
-        this.store._putRowWithReplacingValue("INTERNAL_NAME_PREFIX__MAX_COUNT", prefix, `${count}`);
+    async setCount(prefix: string, count: number): Promise<void> {
+        await this.store._putRowWithReplacingValue("INTERNAL_NAME_PREFIX__MAX_COUNT", prefix, `${count}`);
     }
 
 
@@ -200,9 +215,9 @@ export class NameConverter {
 	 * @param category
 	 * @param predicate
 	 */
-    makeTableName(category: string, predicate: string): string {
-        let c = this.getInternalName(category);
-        let p = this.getInternalName(predicate);
+    async makeTableName(category: string, predicate: string): Promise<string> {
+        let c = await this.getInternalName(category);
+        let p = await this.getInternalName(predicate);
         return c + "__" + p;
     }
 

@@ -17,10 +17,18 @@ function isJson(str) {
 }
 var DataCell = /** @class */ (function () {
     function DataCell(category, objectId, predicate, value) {
-        this.category = category;
-        this.objectId = objectId;
-        this.predicate = predicate;
-        this.value = value;
+        if (typeof (category) === "string") {
+            this.category = category;
+            this.objectId = objectId;
+            this.predicate = predicate;
+            this.value = value;
+        }
+        else if (typeof (category) === "object") {
+            this.category = category[0];
+            this.objectId = category[1];
+            this.predicate = category[2];
+            this.value = category[3];
+        }
         this.info = {};
     }
     DataCell.prototype.encodeTSV = function () {

@@ -21,21 +21,31 @@ export class DataCell {
 
     predicate: string;
 
-    value: any;
+    value: string;
 
 
     info: any;
 
 
-    constructor(category: string,
-        objectId: string,
-        predicate: string,
-        value: any) {
+    constructor(
+        category: string | object,
+        objectId?: string,
+        predicate?: string,
+        value?: string) {
 
-        this.category = category;
-        this.objectId = objectId;
-        this.predicate = predicate;
-        this.value = value;
+        if (typeof (category) === "string") {
+            this.category = category;
+            this.objectId = objectId;
+            this.predicate = predicate;
+            this.value = value;
+        }
+        else if (typeof (category) === "object") {
+            this.category = category[0];
+            this.objectId = category[1];
+            this.predicate = category[2];
+            this.value = category[3];
+        }
+
 
         this.info = {};
     }

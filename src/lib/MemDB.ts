@@ -1,14 +1,14 @@
 
-import { DuplicatedKeyUniqueValueHashMap, StringComparator } from "datacell-collections";
+import { DuplicatedKeyUniqueValueHashMap } from "datacell-collections";
 import { HashMap, JIterator, ImmutableSet, TreeSet } from "typescriptcollectionsframework";
 import { AbstractDB } from "./AbstractDB";
 import { DataCell } from "./DataCell";
-import { Readable } from "stream";
-
+import { Readable, Transform } from "stream";
+import * as streamlib from "datacell-streamlib";
 
 import * as log4js from "log4js";
 const logger = log4js.getLogger();
-logger.level = "debug";
+// logger.level = "debug";
 
 
 
@@ -16,12 +16,11 @@ export class MemDB extends AbstractDB {
 
     // dbName: string;
 
-    // tableName => (category, predicate)
+    // tableName => DuplicatedKeyUniqueValueHashMap(id, value)
     tables: HashMap<string, DuplicatedKeyUniqueValueHashMap<string, string>>;
 
 
     // nameConverter: NameConverter;
-
 
     constructor() {
         super();
@@ -30,47 +29,48 @@ export class MemDB extends AbstractDB {
     }
 
 
-    close(): void {
+    async close(): Promise<void> {
         // nothing to do.
     }
 
 
 
     /** @inheritdoc */
-    _createTable(tableName: string): string {
+    async _createTable(tableName: string): Promise<string> {
 
-        if (this._hasTable(tableName) === true) {
-            return null;
+        if (await this._hasTable(tableName) === true) {
+            return tableName;
         }
+        else {
+            const kvMap = new DuplicatedKeyUniqueValueHashMap<string, any>();
+            this.tables.put(tableName, kvMap);
 
-        const kvMap = new DuplicatedKeyUniqueValueHashMap<string, any>();
-        this.tables.put(tableName, kvMap);
-
-
-        return tableName;
+            return tableName;
+        }
     }
 
 
 
 
     /** @inheritdoc */
-    _hasTable(tableName: string): boolean {
+    async _hasTable(tableName: string): Promise<boolean> {
         return this.tables.containsKey(tableName);
     }
 
 
     /** @inheritdoc */
-    hasTable(cond: DataCell): boolean {
-        const tableName = this.nameConverter
-            .makeTableName(cond.category, cond.predicate);
+    async hasTable(cond: DataCell): Promise<boolean> {
+        const tableName: string
+            = await this.nameConverter
+                .makeTableName(cond.category, cond.predicate);
 
-        return this._hasTable(tableName);
+        return await this._hasTable(tableName);
     }
 
 
     /** @inheritdoc */
-    _deleteTable(tableName: string): string {
-        if (this._hasTable(tableName) === true) {
+    async _deleteTable(tableName: string): Promise<string> {
+        if (await this._hasTable(tableName) === true) {
             this.tables.remove(tableName);
             return tableName;
         }
@@ -82,10 +82,10 @@ export class MemDB extends AbstractDB {
 
 
     /** @inheritdoc */
-    deleteAllTables(): void {
+    async deleteAllTables(): Promise<void> {
         const ks = this.tables.keySet();
         for (const k of ks) {
-            this._deleteTable(k);
+            await this._deleteTable(k);
         }
     }
 
@@ -93,228 +93,255 @@ export class MemDB extends AbstractDB {
 
 
     /** @inheritdoc */
-    getAllTablesIncludingManagementTables(): string[] {
-        const result: string[] = [];
+    async getAllTablesIncludingManagementTables(): Promise<Readable> {
 
-        // logger.debug("MemDB::getAllTables(): " + this.tables.keySet());
+        const iter: JIterator<string> = this.tables.keySet().iterator();
 
-        for (const iter: JIterator<string>
-            = this.tables.keySet().iterator();
-            iter.hasNext();) {
-
-            const name: string = iter.next();
-            result.push(name);
-        }
-
-        return result;
-    }
-
-
-
-
-    /** @inheritdoc */
-    _getIDs(tableName: string): string[] {
-
-        const result: string[] = [];
-        const keys = this.tables.get(tableName).keySet();
-        for (const iter: JIterator<string> = keys.iterator(); iter.hasNext();) {
-            result.push(iter.next()); // This method pushes only "IDs" to the stream.
-        }
-        result.push(null);
-
-        return result;
-    }
-
-
-
-    /** @inheritdoc */
-    _getIDStream(tableName: string): Readable {
-
-        const readable = new Readable({ objectMode: true });
-
-        // const result: string[] = [];
-        const keys = this.tables.get(tableName).keySet();
-        for (const iter: JIterator<string> = keys.iterator(); iter.hasNext();) {
-            readable.push(iter.next()); // This method pushes only "IDs" to the stream.
-        }
-        readable.push(null);
-
-        return readable;
-    }
-
-
-
-    /** @inheritdoc */
-    _getPredicates(category: string, objectID: string): string[] {
-        const result: string[] = [];
-        const tables: string[] = this.getAllTables();
-        for (const t of tables) {
-            const names = this.nameConverter.parseTableName(t);
-            if (this.nameConverter.getOriginalName(names[0]) !== category) {
-                continue;
+        return new Readable({
+            objectMode: true,
+            read() {
+                if (iter.hasNext()) {
+                    this.push(iter.next());
+                }
+                else {
+                    this.push(null);
+                }
             }
-            const predicate = this.nameConverter.getOriginalName(names[1]);
 
-            if (this.tables.get(t).keySet().contains(objectID)) {
-                result.push(predicate);
+        });
+    }
+
+
+
+
+    /** @inheritdoc */
+    async _getIDs(tableName: string): Promise<Readable> {
+
+        const keys = this.tables.get(tableName).keySet();
+        const iter: JIterator<string> = keys.iterator();
+
+        return new Readable({
+            objectMode: true,
+            read() {
+                if (iter.hasNext()) {
+                    this.push(iter.next());
+                }
+                else {
+                    this.push(null);
+                }
             }
-        }
-        return result;
+        });
+    }
+
+
+
+
+    /** @inheritdoc */
+    async _getPredicates(category: string, objectID: string): Promise<Readable> {
+
+        const r_stream: Readable = await this.getAllTables();
+
+        return r_stream
+            .pipe(new streamlib.Filter(async (tableName) => {
+                // names = [category, predicate]
+                const names = this.nameConverter.parseTableName(tableName);
+                return await this.nameConverter.getOriginalName(names[0]) === category;
+            }))
+            .pipe(new streamlib.Filter((tableName) => {
+                return this.tables.get(tableName).keySet().contains(objectID);
+            }))
+            .pipe(new streamlib.Map(async (tableName) => {
+                // names = [category, predicate]
+                const names: string[] = this.nameConverter.parseTableName(tableName);
+                const predicate: string = await this.nameConverter.getOriginalName(names[1]);
+                return predicate;
+            }))
+            .pipe(new streamlib.Unique());
+
     }
 
 
     /** @inheritdoc */
-    getPredicates(cond: DataCell): string[] {
+    getPredicates(cond: DataCell): Promise<Readable> {
         return this._getPredicates(cond.category, cond.objectId);
     }
 
 
 
     /** @inheritdoc */
-    _getValues(tableName: string, objectID: string): string[] {
+    async _getValues(tableName: string, objectID: string): Promise<Readable> {
 
-        const result: string[] = [];
+        let tset: TreeSet<any> = null;
+        let iter: JIterator<string> = null;
 
-        if (!this._hasTable(tableName)) {
-            return result;
+        // logger.debug("MemDB::_getValues() : tableName = " + tableName);
+        // logger.debug("MemDB::_getValues() : objectID = " + objectID);
+
+        if (await this._hasTable(tableName) && await this._hasID(tableName, objectID)) {
+            tset = this.tables.get(tableName).get(objectID);
+            iter = tset.iterator();
         }
 
-        if (!this._hasID(tableName, objectID)) {
-            return result;
-        }
+        return new Readable({
+            objectMode: true,
+            read() {
+                if (tset === null) {
+                    this.push(null);
+                }
+                else if (iter.hasNext()) {
+                    this.push(iter.next());
+                }
+                else {
+                    this.push(null);
+                }
+            }
+        });
 
-        const tset: TreeSet<any> = this.tables.get(tableName).get(objectID);
-
-        for (const iter: JIterator<string>
-            = tset.iterator();
-            iter.hasNext();) {
-
-            const value: string = iter.next();
-            result.push(value);
-        }
-
-        return result;
     }
 
 
+
     /** @inheritdoc */
-    getValues(cond: DataCell): string[] {
-        const tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
+    async getValues(cond: DataCell): Promise<Readable> {
+        const tableName: string
+            = await this.nameConverter.makeTableName(cond.category, cond.predicate);
         return this._getValues(tableName, cond.objectId);
     }
 
 
 
     /** @inheritdoc */
-    _getRows(tableName: string, objectID: string): DataCell[] {
-
-        const result: DataCell[] = [];
+    async _getRows(tableName: string, objectID: string): Promise<Readable> { // DataCell[] {
 
         const names: string[] = this.nameConverter.parseTableName(tableName);
-        const category: string = this.nameConverter.getOriginalName(names[0]);
-        const predicate: string = this.nameConverter.getOriginalName(names[1]);
+        const category: string = await this.nameConverter.getOriginalName(names[0]);
+        const predicate: string = await this.nameConverter.getOriginalName(names[1]);
 
         const tset: TreeSet<any> = this.tables.get(tableName).get(objectID);
-        for (const iter: JIterator<any>
-            = tset.iterator();
-            iter.hasNext();) {
-
-            const value: string = iter.next();
-            result.push(new DataCell(category, objectID, predicate, value));
+        let iter: JIterator<any> = null;
+        if (tset !== null) {
+            iter = tset.iterator();
         }
-        return result;
+
+        return new Readable({
+            objectMode: true,
+            read() {
+                if (tset === null) {
+                    this.push(null);
+                }
+                else if (iter.hasNext()) {
+                    const value: string = iter.next();
+                    this.push(new DataCell(category, objectID, predicate, value));
+                }
+                else {
+                    this.push(null);
+                }
+            }
+        });
+
     }
 
 
 
     /** @inheritdoc */
-    getRows(cond: DataCell): DataCell[] {
-        const tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
+    async getRows(cond: DataCell): Promise<Readable> {
+        const tableName: string
+            = await this.nameConverter.makeTableName(cond.category, cond.predicate);
         return this._getRows(tableName, cond.objectId);
     }
 
 
 
     /** @inheritdoc */
-    _getAllRows(tableName: string): DataCell[] {
-
-        const result: DataCell[] = [];
+    async _getAllRows(tableName: string): Promise<Readable> { // Returns Readable stream of DataCell objects.
 
         const names: string[] = this.nameConverter.parseTableName(tableName);
-        const category: string = this.nameConverter.getOriginalName(names[0]);
-        const predicate: string = this.nameConverter.getOriginalName(names[1]);
+        const category: string = await this.nameConverter.getOriginalName(names[0]);
+        const predicate: string = await this.nameConverter.getOriginalName(names[1]);
 
 
-        const ids: ImmutableSet<string> = this.tables.get(tableName).keySet();
-        for (const iter: JIterator<string> = ids.iterator(); iter.hasNext();) {
-            const objectID = iter.next();
-            const tset: TreeSet<any> = this.tables.get(tableName).get(objectID);
-            for (const iter2: JIterator<any> = tset.iterator(); iter2.hasNext();) {
-
-                const value: string = iter2.next();
-                result.push(new DataCell(category, objectID, predicate, value));
-            }
-        }
-        return result;
-    }
-
-
-
-    /** @inheritdoc */
-    _getStreamOfAllRows(tableName: string): Readable {
-
-        const readable: Readable = new Readable({ objectMode: true });
-
-        const names: string[] = this.nameConverter.parseTableName(tableName);
-        const category: string = this.nameConverter.getOriginalName(names[0]);
-        const predicate: string = this.nameConverter.getOriginalName(names[1]);
-
-
-        const ids: ImmutableSet<string> = this.tables.get(tableName).keySet();
-        for (const iter: JIterator<string> = ids.iterator(); iter.hasNext();) {
-            const objectID = iter.next();
-            const tset: TreeSet<any> = this.tables.get(tableName).get(objectID);
-            for (const iter2: JIterator<any> = tset.iterator(); iter2.hasNext();) {
-
-                const value: string = iter2.next();
-                readable.push(new DataCell(category, objectID, predicate, value));
-            }
-        }
-        return readable;
-    }
-
-
-
-
-    /** @inheritdoc */
-    _hasID(tableName: string, objectID: string): boolean {
-
-        if (!this._hasTable(tableName)) {
-            return false;
-        }
-
-        const tset: TreeSet<any> = this.tables.get(tableName).get(objectID);
-
-        if (tset !== undefined && tset.size() > 0) {
-            return true;
+        let r_stream: Readable = null;
+        if (await this._hasTable(tableName)) {
+            r_stream = await this._getIDs(tableName);
         }
         else {
+            r_stream = Readable.from([]);
+        }
+
+        return r_stream
+            // It should be noted that this map function returns Promise objects.
+            .pipe(new streamlib.Map(async (id) => {
+                const values: string[] = await streamlib.streamToArray(await this._getValues(tableName, id));
+                const result: [string, string[]] = [id, values];
+                return result;
+            }))
+            // Transform Promise<[string, string[]]> to [string, string[]].
+            .pipe(new Transform({
+                defaultEncoding: 'utf8',
+                readableObjectMode: true,
+                writableObjectMode: true,
+                async transform(chunk: Promise<[string, string[]]>, encoding: string, cb: Function) {
+                    this.push(await chunk);
+                    cb();
+                },
+                flush(cb: Function) {
+                    cb();
+                }
+            }))
+            .pipe(new Transform({
+                defaultEncoding: 'utf8',
+                readableObjectMode: true,
+                writableObjectMode: true,
+                transform(chunk: [string, string[]], encoding: string, cb: Function) {
+                    for (const v of chunk[1]) {
+                        this.push(new DataCell(category, chunk[0], predicate, v));
+                    }
+                    cb();
+                },
+                flush(cb: Function) {
+                    cb();
+                }
+            }));
+
+    }
+
+
+
+
+
+    /** @inheritdoc */
+    async _hasID(tableName: string, objectID: string): Promise<boolean> {
+
+        logger.debug("MemDB::_hasID() : tableName = " + tableName);
+        logger.debug("MemDB::_hasID() : objectID = " + objectID);
+
+        if (!await this._hasTable(tableName)) {
             return false;
+        }
+        else {
+            const tset: TreeSet<any> = this.tables.get(tableName).get(objectID);
+
+            if (tset !== undefined && tset.size() > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
 
 
     /** @inheritdoc */
-    hasID(cond: DataCell): boolean {
-        const tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
+    async hasID(cond: DataCell): Promise<boolean> {
+        const tableName: string = await this.nameConverter.makeTableName(cond.category, cond.predicate);
         return this._hasID(tableName, cond.objectId);
     }
 
 
     /** @inheritdoc */
-    _hasRow(tableName: string, objectID: string, value: any): boolean {
+    async _hasRow(tableName: string, objectID: string, value: any): Promise<boolean> {
 
-        if (!this._hasTable(tableName) || !this._hasID(tableName, objectID)) {
+        if (!await this._hasTable(tableName) || ! await this._hasID(tableName, objectID)) {
             return false;
         }
 
@@ -336,25 +363,16 @@ export class MemDB extends AbstractDB {
 
 
     /** @inheritdoc */
-    hasRow(cond: DataCell): boolean {
-        const tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._hasRow(tableName, cond.objectId, cond.value);
+    async hasRow(cond: DataCell): Promise<boolean> {
+        const tableName: string = await this.nameConverter.makeTableName(cond.category, cond.predicate);
+        return await this._hasRow(tableName, cond.objectId, cond.value);
     }
 
 
 
-    /** @inheritdoc */
-    // _compareObjectValues(obj1: any, obj2: any) {
-    //     let str1 = JSON.stringify(obj1);
-    //     let str2 = JSON.stringify(obj2);
-
-    //     return str1 === str2;
-    // }
-
-
 
     /** @inheritdoc */
-    _addRow(tableName: string, objectID: string, value: any): void {
+    async _addRow(tableName: string, objectID: string, value: any): Promise<void> {
 
         // This method assumes that the table has already existed.
 
@@ -367,174 +385,66 @@ export class MemDB extends AbstractDB {
     }
 
 
-    /** @inheritdoc */
-    // addRow(cell: DataCell): void {
-    //     const tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-    //     return this._addRow(tableName, cell.objectId, cell.value);
-    // }
-
-
 
 
     /** @inheritdoc */
-    // _putRow(tableName: string, objectID: string, value: any): void {
-    //     if (!this._hasTable(tableName)) {
-    //         this._createTable(tableName);
-    //     }
-    //     this._addRow(tableName, objectID, value);
-    // }
-
-
-    /** @inheritdoc */
-    putRow(cell: DataCell): void {
-        const tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._putRow(tableName, cell.objectId, cell.value);
-    }
-
-
-    /** @inheritdoc */
-    // _putRowIfKeyValuePairIsAbsent(tableName: string, objectID: string, value: any): void {
-    //     if (!this._hasTable(tableName)) {
-    //         this._createTable(tableName);
-    //     }
-
-    //     this._addRow(tableName, objectID, value);
-    // }
-
-
-    /** @inheritdoc */
-    putRowIfKeyValuePairIsAbsent(cell: DataCell): void {
-        const tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._putRowIfKeyValuePairIsAbsent(tableName, cell.objectId, cell.value);
-    }
-
-
-    /** @inheritdoc */
-    // _putRowIfKeyIsAbsent(tableName: string, objectID: string, value: any): void {
-    //     if (!this._hasTable(tableName)) {
-    //         this._createTable(tableName);
-    //     }
-
-    //     if (!this._hasID(tableName, objectID)) {
-    //         this._addRow(tableName, objectID, value);
-    //     }
-    // }
-
-
-    /** @inheritdoc */
-    putRowIfKeyIsAbsent(cell: DataCell): void {
-        const tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return this._putRowIfKeyIsAbsent(tableName, cell.objectId, cell.value);
-    }
-
-
-    /** @inheritdoc */
-    _putRowWithReplacingValue(tableName: string, objectID: string, value: any): void {
-        if (!this._hasTable(tableName)) {
-            this._createTable(tableName);
+    async _putRowWithReplacingValue(tableName: string, objectID: string, value: any): Promise<void> {
+        if (!await this._hasTable(tableName)) {
+            await this._createTable(tableName);
         }
 
-        if (!this._hasRow(tableName, objectID, value)) {
+        if (! await this._hasRow(tableName, objectID, value)) {
             this.tables.get(tableName).set(objectID, value);
         }
     }
 
 
-    /** @inheritdoc */
-    // putRowWithReplacingValue(cell: DataCell): void {
-    //     const tableName = this.nameConverter.makeTableName(cell.category, cell.predicate);
-    //     return this._putRowWithReplacingValue(tableName, cell.objectId, cell.value);
-    // }
-
-
-
 
     /** @inheritdoc */
-    deleteRow(cond: DataCell): void {
-        const tableName = this.nameConverter.makeTableName(cond.category, cond.predicate);
+    async deleteRow(cond: DataCell): Promise<void> {
+        const tableName: string
+            = await this.nameConverter.makeTableName(cond.category, cond.predicate);
 
         this.tables.get(tableName).get(cond.objectId).remove(cond.value);
     }
 
 
 
+    async _categoryToObjectIDs(category: string): Promise<Readable> {
 
-    // writeToFile(fname: string, tableName?: string): Promise<void> {
-    //     if (tableName !== null) {
-    //         this._writeToFile(fname, tableName);
-    //     }
-    //     else {
-    //         for (let t of this.getAllTables()) {
-    //             this._writeToFile(fname, t);
-    //         }
-    //     }
-    // }
+        // tableName => DuplicatedKeyUniqueValueHashMap(id, value)
+        const tableObj: HashMap<string, DuplicatedKeyUniqueValueHashMap<string, string>> = this.tables;
 
-    // /** @inheritdoc */
-    // print(): void {
+        const r_stream: Readable = await this.getAllTables();
 
-    //     const categories = this.getAllCategories().sort();
-    //     // console.log("categories.length: " + categories.length);
-    //     for (const c of categories) {
-    //         const ids: string[] = this._categoryToObjectIDs(c).sort();
-    //         // console.log("  ids.length: " + ids.length);
-    //         for (const i of ids) {
-    //             const preds: string[] = this._getPredicates(c, i).sort();
-    //             // console.log("    preds.length: " + preds.length);
-    //             for (const p of preds) {
-    //                 const values: any[] = this.getValues(new DataCell(c, i, p, ""));
-    //                 // console.log("    values.length: " + values.length);
-
-    //                 for (const v of values) {
-    //                     console.log(c + "\t" + i + "\t" + p + "\t" + JSON.stringify(v));
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    // }
-
-
-
-    _categoryToObjectIDs(category: string): string[] {
-        const result: string[] = [];
-        const objectIDs = new TreeSet<string>(new StringComparator());
-
-        // the variable "tables" is an array of table names.
-        const tables: string[] = this._categoryToTables(category);
-
-        for (const t of tables) { // t is a table name.
-            const ks = this.tables.get(t).keySet();
-            for (const iter: JIterator<string> = ks.iterator();
-                iter.hasNext();) {
-
-                objectIDs.add(iter.next());
-            }
-        }
-
-
-        for (const iter: JIterator<string> = objectIDs.iterator();
-            iter.hasNext();) {
-
-            result.push(iter.next());
-        }
-
-        return result;
+        return r_stream
+            .pipe(new streamlib.Filter(async (tableName) => {
+                // names = [category, predicate]
+                const names: string[] = this.nameConverter.parseTableName(tableName);
+                const c: string = await this.nameConverter.getOriginalName(names[0]);
+                return category === c;
+            }))
+            .pipe(new Transform({
+                defaultEncoding: 'utf8',
+                readableObjectMode: true,
+                writableObjectMode: true,
+                transform(tableName, encoding, cb) {
+                    // ImmutableSet of objectIDs.
+                    const ks: ImmutableSet<string> = tableObj.get(tableName).keySet();
+                    for (const iter: JIterator<string> = ks.iterator(); iter.hasNext();) {
+                        this.push(iter.next());
+                    }
+                    cb();
+                },
+                flush(cb) {
+                    cb();
+                }
+            }));
 
     }
 
 
-
-
-
 }
-
-
-
-
-// -----
-
-
 
 
 
