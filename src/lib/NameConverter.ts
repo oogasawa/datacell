@@ -38,11 +38,11 @@ export class NameConverter {
     }
 
 
-    init(store: DataCellStore) {
+    async init(store: DataCellStore): Promise<void> {
         this.store = store;
-        this.store._createTable("ORIGINAL_NAME__INTERNAL_NAME");
-        this.store._createTable("INTERNAL_NAME__ORIGINAL_NAME");
-        this.store._createTable("INTERNAL_NAME__MAX_COUNT");
+        await this.store._createTable("ORIGINAL_NAME__INTERNAL_NAME");
+        await this.store._createTable("INTERNAL_NAME__ORIGINAL_NAME");
+        await this.store._createTable("INTERNAL_NAME__MAX_COUNT");
     }
 
 
