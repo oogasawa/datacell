@@ -24,12 +24,16 @@ export class MemDB extends AbstractDB {
 
     constructor() {
         super();
-        this.tables = new HashMap<string, DuplicatedKeyUniqueValueHashMap<string, string>>();
-        this.nameConverter.init(this);
     }
 
 
-    async close(): Promise<void> {
+    async connect(arg?: object): Promise<void> {
+        this.tables = new HashMap<string, DuplicatedKeyUniqueValueHashMap<string, string>>();
+        this.nameConverter.init(this);
+        // nothing to do.
+    }
+
+    async disconnect(): Promise<void> {
         // nothing to do.
     }
 
@@ -312,8 +316,8 @@ export class MemDB extends AbstractDB {
     /** @inheritdoc */
     async _hasID(tableName: string, objectID: string): Promise<boolean> {
 
-        logger.debug("MemDB::_hasID() : tableName = " + tableName);
-        logger.debug("MemDB::_hasID() : objectID = " + objectID);
+        // logger.debug("MemDB::_hasID() : tableName = " + tableName);
+        // logger.debug("MemDB::_hasID() : objectID = " + objectID);
 
         if (!await this._hasTable(tableName)) {
             return false;

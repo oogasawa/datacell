@@ -3,24 +3,36 @@ import { expect } from 'chai';
 import 'mocha';
 
 import { NameConverter } from "../../src/lib/NameConverter";
+import { DataCellStore } from "../../src/lib/DataCellStore";
 import { MemDB } from "../../src/lib/MemDB";
 // import { DataCellStore } from "../../src/libs/DataCellStore";
 
 import * as log4js from "log4js";
 const logger = log4js.getLogger();
-logger.level = "error";
-
 
 
 describe('NameConverter', () => {
 
-    context("constructor", () => {
-        it('should be able to construct with MemDB.', async () => {
+    let dbObj: DataCellStore = null;
+
+    let nc: NameConverter = null;
+
+    beforeEach(async () => {
+        dbObj = new MemDB();
+        await dbObj.connect();
+        nc = dbObj.getNameConverter();
+    });
+
+
+    afterEach(async () => {
+        await dbObj.disconnect();
+    });
+
+
+    context("creation of a NameConverter object", () => {
+        it('A NameConverter object should be created by DataCellStore::connect() method..', async () => {
 
             //logger.level = "debug";
-
-            const nc = new NameConverter();
-            nc.init(new MemDB());
             const result: boolean = await nc.hasOriginalName("dummy");
             expect(result).to.equal(false);
 
@@ -31,15 +43,11 @@ describe('NameConverter', () => {
 
     context("_makeInternalName", () => {
         it('should return upper case string of origName when origName matches the alnum pattern.', async () => {
-            const nc = new NameConverter();
-            nc.init(new MemDB());
             const result: string = await nc._makeInternalName("alnum");
             expect(result).to.equal("ALNUM");
         });
 
         it('should connect words with underscores.', async () => {
-            const nc = new NameConverter();
-            nc.init(new MemDB());
             let result: string = await nc._makeInternalName("alnum abc");
             expect(result).to.equal("ALNUM_ABC");
 
@@ -49,21 +57,13 @@ describe('NameConverter', () => {
 
         it('should truncate string when the origName is too long.', async () => {
 
-            // logger.level = "debug";
-
-            const nc = new NameConverter();
-            nc.init(new MemDB());
             const result: string = await nc._makeInternalName("this is an example of the original name which is too long");
             expect(result).to.equal("THIS_IS_AN_EXAMPLE_O00001");
-
-            // logger.level = "error";
 
         });
 
 
         it('should prefixed alnum when origName contains non-alnum characters.', async () => {
-            const nc = new NameConverter();
-            nc.init(new MemDB());
             let result: string = await nc._makeInternalName("including@nonalnum");
             expect(result).to.equal("NONALNUM00001");
 
@@ -78,8 +78,6 @@ describe('NameConverter', () => {
 
     context("getInternalName", () => {
         it('should return internal name corresponds to the given original name.', async () => {
-            const nc = new NameConverter();
-            nc.init(new MemDB());
 
             const origNames = ["actor topic",
                 "an too long name which should be prefixed",
@@ -112,8 +110,6 @@ describe('NameConverter', () => {
 
     context("getOriginalName", () => {
         it('should return original name corresponds to the given internal name.', async () => {
-            const nc = new NameConverter();
-            nc.init(new MemDB());
 
             const origNames = ["actor topic",
                 "an too long name which should be prefixed",
@@ -146,8 +142,7 @@ describe('NameConverter', () => {
 
     context("makeTableName", () => {
         it('should return table name that consists of a pair of two internal names.', async () => {
-            const nc = new NameConverter();
-            nc.init(new MemDB());
+
             const result: string = await nc.makeTableName("actor topic", "a too long name which should be prefixed");
 
             expect(result).to.equal("ACTOR_TOPIC__A_TOO_LONG_NAME_WHIC00001");
@@ -158,9 +153,6 @@ describe('NameConverter', () => {
 
     context("hasOriginalName", () => {
         it('should return true or false depending on whether the original name is stored or not.', async () => {
-
-            const nc = new NameConverter();
-            nc.init(new MemDB());
 
             const origNames = ["actor topic",
                 "an too long name which should be prefixed",

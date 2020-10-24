@@ -9,7 +9,7 @@ import { Readable, Transform } from "stream";
 
 import * as log4js from 'log4js';
 const logger = log4js.getLogger();
-logger.level = 'error';
+// logger.level = 'error';
 
 
 export abstract class AbstractDB implements DataCellStore {
@@ -23,8 +23,11 @@ export abstract class AbstractDB implements DataCellStore {
         this.nameConverter = new NameConverter();
     }
 
+
+    abstract connect(arg?: object): Promise<void>;
+
     /** @inheritdoc */
-    abstract close(): Promise<void>;
+    abstract disconnect(): Promise<void>;
 
 
 

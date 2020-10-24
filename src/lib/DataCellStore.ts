@@ -7,10 +7,14 @@ import { Readable } from "stream";
 export interface DataCellStore {
 
 
+
+    connect(arg?: object): Promise<void>;
+
+
 	/** Close connection to the DataCellStore.
 	 *
 	 */
-    close(): Promise<void>;
+    disconnect(): Promise<void>;
 
 
     getNameConverter(): NameConverter;

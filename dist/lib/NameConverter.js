@@ -248,10 +248,10 @@ var NameConverter = /** @class */ (function () {
                     case 7:
                         _a.sent();
                         _a.label = 8;
-                    case 8:
-                        logger.debug("NameConverter::_makeInternalName() : origName = " + origName);
-                        logger.debug("NameConverter::_makeInternalName() : internalName = " + internalName);
-                        return [2 /*return*/, internalName];
+                    case 8: 
+                    // logger.debug("NameConverter::_makeInternalName() : origName = " + origName);
+                    // logger.debug("NameConverter::_makeInternalName() : internalName = " + internalName);
+                    return [2 /*return*/, internalName];
                 }
             });
         });

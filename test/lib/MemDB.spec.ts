@@ -10,7 +10,7 @@ import { Readable } from "stream";
 
 import * as log4js from "log4js";
 const logger = log4js.getLogger();
-logger.level = "debug";
+// logger.level = "debug";
 
 const data: string[][] = [
     ["actor topic",
@@ -41,13 +41,17 @@ describe('MemDB', () => {
 
     let dbObj: MemDB;
 
-    beforeEach(() => {
+    before(() => {
         dbObj = new MemDB();
     });
 
 
+    beforeEach(() => {
+        dbObj.connect();
+    });
+
     afterEach(() => {
-        dbObj.close();
+        dbObj.disconnect();
     });
 
 
@@ -106,9 +110,9 @@ describe('MemDB', () => {
 
             tables = await streamlib.streamToArray(await dbObj.getAllTables());
             expect(tables.length).to.equal(3);
-            logger.level = "debug";
-            logger.debug(tables);
-            logger.level = "error";
+            // logger.level = "debug";
+            // logger.debug(tables);
+            // logger.level = "error";
 
         });
 

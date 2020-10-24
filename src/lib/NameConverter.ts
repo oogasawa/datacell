@@ -169,8 +169,8 @@ export class NameConverter {
             await this.setCount(prefix, counter);
         }
 
-        logger.debug("NameConverter::_makeInternalName() : origName = " + origName);
-        logger.debug("NameConverter::_makeInternalName() : internalName = " + internalName);
+        // logger.debug("NameConverter::_makeInternalName() : origName = " + origName);
+        // logger.debug("NameConverter::_makeInternalName() : internalName = " + internalName);
 
         return internalName;
     }

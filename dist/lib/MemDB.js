@@ -93,12 +93,18 @@ var MemDB = /** @class */ (function (_super) {
     __extends(MemDB, _super);
     // nameConverter: NameConverter;
     function MemDB() {
-        var _this = _super.call(this) || this;
-        _this.tables = new typescriptcollectionsframework_1.HashMap();
-        _this.nameConverter.init(_this);
-        return _this;
+        return _super.call(this) || this;
     }
-    MemDB.prototype.close = function () {
+    MemDB.prototype.connect = function (arg) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.tables = new typescriptcollectionsframework_1.HashMap();
+                this.nameConverter.init(this);
+                return [2 /*return*/];
+            });
+        });
+    };
+    MemDB.prototype.disconnect = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/];
@@ -508,11 +514,10 @@ var MemDB = /** @class */ (function (_super) {
             var tset;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        logger.debug("MemDB::_hasID() : tableName = " + tableName);
-                        logger.debug("MemDB::_hasID() : objectID = " + objectID);
-                        return [4 /*yield*/, this._hasTable(tableName)];
+                    case 0: return [4 /*yield*/, this._hasTable(tableName)];
                     case 1:
+                        // logger.debug("MemDB::_hasID() : tableName = " + tableName);
+                        // logger.debug("MemDB::_hasID() : objectID = " + objectID);
                         if (!(_a.sent())) {
                             return [2 /*return*/, false];
                         }

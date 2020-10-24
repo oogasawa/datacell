@@ -69,7 +69,7 @@ var streamlib = __importStar(require("datacell-streamlib"));
 var stream_1 = require("stream");
 var log4js = __importStar(require("log4js"));
 var logger = log4js.getLogger();
-logger.level = 'error';
+// logger.level = 'error';
 var AbstractDB = /** @class */ (function () {
     function AbstractDB() {
         this.nameConverter = new NameConverter_1.NameConverter();
