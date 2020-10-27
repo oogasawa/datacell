@@ -311,8 +311,24 @@ export abstract class AbstractDB implements DataCellStore {
     }
 
 
+
+    abstract _deleteID(tableName: string, objectID: string): Promise<string>;
+
+
     /** @inheritdoc */
-    abstract _putRowWithReplacingValue(tableName: string, objectID: string, value: any): Promise<void>;
+    async _putRowWithReplacingValue(tableName: string, objectID: string, value: any): Promise<void> {
+
+        if (! await this._hasTable(tableName)) {
+            await this._createTable(tableName);
+        }
+
+        if (await this._hasID(tableName, objectID)) {
+            await this._deleteID(tableName, objectID);
+        }
+        await this._addRow(tableName, objectID, value);
+
+    }
+
 
 
     /** @inheritdoc */

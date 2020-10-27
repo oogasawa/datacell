@@ -253,6 +253,9 @@ export interface DataCellStore {
     deleteRow(cond: DataCell): Promise<void>;
 
 
+    _deleteID(tableName: string, objectID: string): Promise<string>;
+
+
     _isManagementTable(tableName: string): boolean;
 
 
@@ -260,6 +263,8 @@ export interface DataCellStore {
 
 
     print(): Promise<void>;
+
+
 
 
 }

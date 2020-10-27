@@ -81,7 +81,6 @@ var __values = (this && this.__values) || function(o) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemDB = void 0;
 var datacell_collections_1 = require("datacell-collections");
-var typescriptcollectionsframework_1 = require("typescriptcollectionsframework");
 var AbstractDB_1 = require("./AbstractDB");
 var DataCell_1 = require("./DataCell");
 var stream_1 = require("stream");
@@ -98,7 +97,7 @@ var MemDB = /** @class */ (function (_super) {
     MemDB.prototype.connect = function (arg) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                this.tables = new typescriptcollectionsframework_1.HashMap();
+                this.tables = new Map();
                 this.nameConverter.init(this);
                 return [2 /*return*/];
             });
@@ -124,7 +123,7 @@ var MemDB = /** @class */ (function (_super) {
                         }
                         else {
                             kvMap = new datacell_collections_1.DuplicatedKeyUniqueValueHashMap();
-                            this.tables.put(tableName, kvMap);
+                            this.tables.set(tableName, kvMap);
                             return [2 /*return*/, tableName];
                         }
                         return [2 /*return*/];
@@ -136,7 +135,7 @@ var MemDB = /** @class */ (function (_super) {
     MemDB.prototype._hasTable = function (tableName) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.tables.containsKey(tableName)];
+                return [2 /*return*/, this.tables.has(tableName)];
             });
         });
     };
@@ -164,7 +163,7 @@ var MemDB = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, this._hasTable(tableName)];
                     case 1:
                         if ((_a.sent()) === true) {
-                            this.tables.remove(tableName);
+                            this.tables.delete(tableName);
                             return [2 /*return*/, tableName];
                         }
                         else {
@@ -183,7 +182,7 @@ var MemDB = /** @class */ (function (_super) {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        ks = this.tables.keySet();
+                        ks = this.tables.keys();
                         _b.label = 1;
                     case 1:
                         _b.trys.push([1, 6, 7, 8]);
@@ -220,12 +219,13 @@ var MemDB = /** @class */ (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             var iter;
             return __generator(this, function (_a) {
-                iter = this.tables.keySet().iterator();
+                iter = this.tables.keys();
                 return [2 /*return*/, new stream_1.Readable({
                         objectMode: true,
                         read: function () {
-                            if (iter.hasNext()) {
-                                this.push(iter.next());
+                            var k = iter.next();
+                            if (!k.done) {
+                                this.push(k.value);
                             }
                             else {
                                 this.push(null);
@@ -238,15 +238,17 @@ var MemDB = /** @class */ (function (_super) {
     /** @inheritdoc */
     MemDB.prototype._getIDs = function (tableName) {
         return __awaiter(this, void 0, void 0, function () {
-            var keys, iter;
+            var hashmap, ks, iter;
             return __generator(this, function (_a) {
-                keys = this.tables.get(tableName).keySet();
-                iter = keys.iterator();
+                hashmap = this.tables.get(tableName);
+                ks = hashmap.keySet();
+                iter = ks.values();
                 return [2 /*return*/, new stream_1.Readable({
                         objectMode: true,
                         read: function () {
-                            if (iter.hasNext()) {
-                                this.push(iter.next());
+                            var k = iter.next();
+                            if (!k.done) {
+                                this.push(k.value);
                             }
                             else {
                                 this.push(null);
@@ -279,7 +281,7 @@ var MemDB = /** @class */ (function (_super) {
                                 });
                             }); }))
                                 .pipe(new streamlib.Filter(function (tableName) {
-                                return _this.tables.get(tableName).keySet().contains(objectID);
+                                return _this.tables.get(tableName).keySet().has(objectID);
                             }))
                                 .pipe(new streamlib.Map(function (tableName) { return __awaiter(_this, void 0, void 0, function () {
                                 var names, predicate;
@@ -306,11 +308,11 @@ var MemDB = /** @class */ (function (_super) {
     /** @inheritdoc */
     MemDB.prototype._getValues = function (tableName, objectID) {
         return __awaiter(this, void 0, void 0, function () {
-            var tset, iter, _a;
+            var valueSet, iter, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        tset = null;
+                        valueSet = null;
                         iter = null;
                         return [4 /*yield*/, this._hasTable(tableName)];
                     case 1:
@@ -324,20 +326,23 @@ var MemDB = /** @class */ (function (_super) {
                         // logger.debug("MemDB::_getValues() : tableName = " + tableName);
                         // logger.debug("MemDB::_getValues() : objectID = " + objectID);
                         if (_a) {
-                            tset = this.tables.get(tableName).get(objectID);
-                            iter = tset.iterator();
+                            valueSet = this.tables.get(tableName).get(objectID);
+                            iter = valueSet.keys();
                         }
                         return [2 /*return*/, new stream_1.Readable({
                                 objectMode: true,
                                 read: function () {
-                                    if (tset === null) {
+                                    if (valueSet === null) {
                                         this.push(null);
-                                    }
-                                    else if (iter.hasNext()) {
-                                        this.push(iter.next());
                                     }
                                     else {
-                                        this.push(null);
+                                        var v = iter.next();
+                                        if (v.done) {
+                                            this.push(null);
+                                        }
+                                        else {
+                                            this.push(v.value);
+                                        }
                                     }
                                 }
                             })];
@@ -362,7 +367,7 @@ var MemDB = /** @class */ (function (_super) {
     /** @inheritdoc */
     MemDB.prototype._getRows = function (tableName, objectID) {
         return __awaiter(this, void 0, void 0, function () {
-            var names, category, predicate, tset, iter;
+            var names, category, predicate, valueSet, iter;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -373,23 +378,22 @@ var MemDB = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.nameConverter.getOriginalName(names[1])];
                     case 2:
                         predicate = _a.sent();
-                        tset = this.tables.get(tableName).get(objectID);
-                        iter = null;
-                        if (tset !== null) {
-                            iter = tset.iterator();
-                        }
+                        valueSet = this.tables.get(tableName).get(objectID);
+                        iter = valueSet.keys();
                         return [2 /*return*/, new stream_1.Readable({
                                 objectMode: true,
                                 read: function () {
-                                    if (tset === null) {
+                                    if (valueSet === null) {
                                         this.push(null);
-                                    }
-                                    else if (iter.hasNext()) {
-                                        var value = iter.next();
-                                        this.push(new DataCell_1.DataCell(category, objectID, predicate, value));
                                     }
                                     else {
-                                        this.push(null);
+                                        var value = iter.next();
+                                        if (value.done) {
+                                            this.push(null);
+                                        }
+                                        else {
+                                            this.push(new DataCell_1.DataCell(category, objectID, predicate, value.value));
+                                        }
                                     }
                                 }
                             })];
@@ -511,7 +515,7 @@ var MemDB = /** @class */ (function (_super) {
     /** @inheritdoc */
     MemDB.prototype._hasID = function (tableName, objectID) {
         return __awaiter(this, void 0, void 0, function () {
-            var tset;
+            var valueSet;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this._hasTable(tableName)];
@@ -522,8 +526,8 @@ var MemDB = /** @class */ (function (_super) {
                             return [2 /*return*/, false];
                         }
                         else {
-                            tset = this.tables.get(tableName).get(objectID);
-                            if (tset !== undefined && tset.size() > 0) {
+                            valueSet = this.tables.get(tableName).get(objectID);
+                            if (valueSet !== undefined && valueSet.size > 0) {
                                 return [2 /*return*/, true];
                             }
                             else {
@@ -552,7 +556,7 @@ var MemDB = /** @class */ (function (_super) {
     /** @inheritdoc */
     MemDB.prototype._hasRow = function (tableName, objectID, value) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, tset, iter, v;
+            var _a, valueSet, iter, v;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, this._hasTable(tableName)];
@@ -567,10 +571,11 @@ var MemDB = /** @class */ (function (_super) {
                         if (_a) {
                             return [2 /*return*/, false];
                         }
-                        tset = this.tables.get(tableName).get(objectID);
-                        for (iter = tset.iterator(); iter.hasNext();) {
-                            v = iter.next();
-                            if (this._compareObjectValues(value, v)) {
+                        valueSet = this.tables.get(tableName).get(objectID);
+                        iter = valueSet.keys();
+                        v = iter.next();
+                        while (!v.done) {
+                            if (v.value === value) {
                                 return [2 /*return*/, true];
                             }
                         }
@@ -609,25 +614,11 @@ var MemDB = /** @class */ (function (_super) {
             });
         });
     };
-    /** @inheritdoc */
-    MemDB.prototype._putRowWithReplacingValue = function (tableName, objectID, value) {
+    MemDB.prototype._deleteID = function (tableName, objectID) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this._hasTable(tableName)];
-                    case 1:
-                        if (!!(_a.sent())) return [3 /*break*/, 3];
-                        return [4 /*yield*/, this._createTable(tableName)];
-                    case 2:
-                        _a.sent();
-                        _a.label = 3;
-                    case 3: return [4 /*yield*/, this._hasRow(tableName, objectID, value)];
-                    case 4:
-                        if (!(_a.sent())) {
-                            this.tables.get(tableName).set(objectID, value);
-                        }
-                        return [2 /*return*/];
-                }
+                this.tables.get(tableName).removeKey(objectID);
+                return [2 /*return*/];
             });
         });
     };
@@ -640,7 +631,7 @@ var MemDB = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
                     case 1:
                         tableName = _a.sent();
-                        this.tables.get(tableName).get(cond.objectId).remove(cond.value);
+                        this.tables.get(tableName).get(cond.objectId).delete(cond.value);
                         return [2 /*return*/];
                 }
             });
@@ -676,11 +667,12 @@ var MemDB = /** @class */ (function (_super) {
                                 readableObjectMode: true,
                                 writableObjectMode: true,
                                 transform: function (tableName, encoding, cb) {
+                                    var _this = this;
                                     // ImmutableSet of objectIDs.
                                     var ks = tableObj.get(tableName).keySet();
-                                    for (var iter = ks.iterator(); iter.hasNext();) {
-                                        this.push(iter.next());
-                                    }
+                                    ks.forEach(function (k) {
+                                        _this.push(k);
+                                    });
                                     cb();
                                 },
                                 flush: function (cb) {

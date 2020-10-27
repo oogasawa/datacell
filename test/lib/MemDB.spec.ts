@@ -46,36 +46,66 @@ describe('MemDB', () => {
     });
 
 
-    beforeEach(() => {
-        dbObj.connect();
+    beforeEach(async () => {
+        await dbObj.connect();
     });
 
-    afterEach(() => {
-        dbObj.disconnect();
+    afterEach(async () => {
+        await dbObj.disconnect();
     });
 
 
     context("constructor", () => {
 
 
-        it('immediately after the construction, there are three management tables in the store.', async () => {
+        it('immediately after construction, there are three management tables in the store.', async () => {
             const tables: string[] = await streamlib.streamToArray(await dbObj.getAllTablesIncludingManagementTables());
             expect(tables.length).equals(3);
         });
 
 
-        it('immediately after the construction, no tables should be contained in the store other than the management tables.', async () => {
+        it('immediately after construction, no tables should be contained in the store other than the management tables.', async () => {
             const tables: string[] = await streamlib.streamToArray(await dbObj.getAllTables());
             expect(tables.length).to.equal(0);
         });
 
 
-        it('immediately after the construction, getAllCategories() should return an empty array.', async () => {
+        it('immediately after construction, getAllCategories() should return an empty array.', async () => {
             const categories: string[] = await streamlib.streamToArray(await dbObj.getAllCategories());
             // console.log(tables);
             expect(categories.length).to.equal(0);
         });
 
+
+    });
+
+
+    context("_putRow() and _deleteID()", () => {
+
+        it('immediately after the construction, there are three management tables in the store.', async () => {
+            await dbObj._putRow("ACTOR_TOPIC__ACTORDEF", "20200520-004844-473575", "EShellAD");
+            await dbObj._putRow("ACTOR_TOPIC__ACTORDEF", "20200520-004844-473575", "EShellAD2");
+            await dbObj._putRow("ACTOR_TOPIC__ACTORDEF", "20200101-000000-000000", "InterpreterAD");
+
+            // logger.level = "debug";
+
+            let result: string[] = await streamlib.streamToArray(await dbObj._getIDs("ACTOR_TOPIC__ACTORDEF"));
+            expect(result.length).equals(2);
+
+            let rows: string[] = await streamlib.streamToArray(await dbObj._getAllRows("ACTOR_TOPIC__ACTORDEF"));
+            expect(rows.length).equals(3);
+
+            // logger.debug("_putRow and _deleteID : " + JSON.stringify(result));
+
+            await dbObj._deleteID("ACTOR_TOPIC__ACTORDEF", "20200520-004844-473575");
+
+            result = await streamlib.streamToArray(await dbObj._getIDs("ACTOR_TOPIC__ACTORDEF"));
+            expect(result.length).equals(1);
+
+            rows = await streamlib.streamToArray(await dbObj._getAllRows("ACTOR_TOPIC__ACTORDEF"));
+            expect(rows.length).equals(1);
+
+        });
 
     });
 

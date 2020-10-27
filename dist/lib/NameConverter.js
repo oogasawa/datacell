@@ -76,10 +76,24 @@ var NameConverter = /** @class */ (function () {
         // nothing to do.
     }
     NameConverter.prototype.init = function (store) {
-        this.store = store;
-        this.store._createTable("ORIGINAL_NAME__INTERNAL_NAME");
-        this.store._createTable("INTERNAL_NAME__ORIGINAL_NAME");
-        this.store._createTable("INTERNAL_NAME__MAX_COUNT");
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.store = store;
+                        return [4 /*yield*/, this.store._createTable("ORIGINAL_NAME__INTERNAL_NAME")];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.store._createTable("INTERNAL_NAME__ORIGINAL_NAME")];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.store._createTable("INTERNAL_NAME__MAX_COUNT")];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     /** Set a data cell store to this object and creates management tables.
      *

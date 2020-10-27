@@ -505,6 +505,33 @@ var AbstractDB = /** @class */ (function () {
         });
     };
     /** @inheritdoc */
+    AbstractDB.prototype._putRowWithReplacingValue = function (tableName, objectID, value) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._hasTable(tableName)];
+                    case 1:
+                        if (!!(_a.sent())) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this._createTable(tableName)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, this._hasID(tableName, objectID)];
+                    case 4:
+                        if (!_a.sent()) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this._deleteID(tableName, objectID)];
+                    case 5:
+                        _a.sent();
+                        _a.label = 6;
+                    case 6: return [4 /*yield*/, this._addRow(tableName, objectID, value)];
+                    case 7:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /** @inheritdoc */
     AbstractDB.prototype.putRowWithReplacingValue = function (cell) {
         return __awaiter(this, void 0, void 0, function () {
             var tableName;
