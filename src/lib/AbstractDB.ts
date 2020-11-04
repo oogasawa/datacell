@@ -341,7 +341,15 @@ export abstract class AbstractDB implements DataCellStore {
 
 
     /** @inheritdoc */
-    abstract deleteRow(cond: DataCell): Promise<void>;
+    abstract _deleteRow(tableName: string, id: string, value: string): Promise<void>;
+
+
+
+    /** @inheritdoc */
+    async deleteRow(cell: DataCell): Promise<void> {
+        const tableName: string = await this.nameConverter.makeTableName(cell.category, cell.predicate);
+        return await this._deleteRow(tableName, cell.objectId, cell.value);
+    }
 
 
 

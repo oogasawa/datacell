@@ -547,6 +547,21 @@ var AbstractDB = /** @class */ (function () {
         });
     };
     /** @inheritdoc */
+    AbstractDB.prototype.deleteRow = function (cell) {
+        return __awaiter(this, void 0, void 0, function () {
+            var tableName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cell.category, cell.predicate)];
+                    case 1:
+                        tableName = _a.sent();
+                        return [4 /*yield*/, this._deleteRow(tableName, cell.objectId, cell.value)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    /** @inheritdoc */
     AbstractDB.prototype.print = function () {
         return __awaiter(this, void 0, void 0, function () {
             var r_stream;

@@ -140,7 +140,10 @@ export interface DataCellStore {
     getRows(cond: DataCell): Promise<Readable>; // DataCell[];
 
 
-	/** Returns an array of all data cells which is stored in a given table.
+	/** Returns an array of all data cells in a given table.
+	 *
+	 * This method does not check if the given table exists or not.
+	 * If the given table does not exist, this method throws an exception.
 	 *
 	 * @param tableName
 	 * @return Readable stream of DataCell objects.
@@ -149,7 +152,10 @@ export interface DataCellStore {
 
 
 
-	/** Returns an array of all data cells which is stored in a given table (a category / predicate pair).
+	/** Returns an array of all data cells in a given table (a category / predicate pair).
+	 *
+	 * This method does not check if the given table exists or not.
+	 * If the given table does not exist, this method throws an exception.
 	 *
 	 * @param tableName
 	 * @param objectID
@@ -248,6 +254,9 @@ export interface DataCellStore {
 
 
     putRowWithReplacingValue(cell: DataCell): Promise<void>;
+
+
+    _deleteRow(tableName: string, objectID: string, value: string): Promise<void>;
 
 
     deleteRow(cond: DataCell): Promise<void>;

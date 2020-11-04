@@ -399,12 +399,11 @@ export class MemDB extends AbstractDB {
 
 
 
-    /** @inheritdoc */
-    async deleteRow(cond: DataCell): Promise<void> {
-        const tableName: string
-            = await this.nameConverter.makeTableName(cond.category, cond.predicate);
 
-        this.tables.get(tableName).get(cond.objectId).delete(cond.value);
+
+    /** @inheritdoc */
+    async _deleteRow(tableName: string, id: string, value: string): Promise<void> {
+        this.tables.get(tableName).get(id).delete(value);
     }
 
 

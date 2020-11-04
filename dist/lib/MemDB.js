@@ -623,17 +623,11 @@ var MemDB = /** @class */ (function (_super) {
         });
     };
     /** @inheritdoc */
-    MemDB.prototype.deleteRow = function (cond) {
+    MemDB.prototype._deleteRow = function (tableName, id, value) {
         return __awaiter(this, void 0, void 0, function () {
-            var tableName;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.nameConverter.makeTableName(cond.category, cond.predicate)];
-                    case 1:
-                        tableName = _a.sent();
-                        this.tables.get(tableName).get(cond.objectId).delete(cond.value);
-                        return [2 /*return*/];
-                }
+                this.tables.get(tableName).get(id).delete(value);
+                return [2 /*return*/];
             });
         });
     };
