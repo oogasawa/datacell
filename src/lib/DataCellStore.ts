@@ -268,6 +268,9 @@ export interface DataCellStore {
     _isManagementTable(tableName: string): boolean;
 
 
+    _categoryToObjectIDs(category: string): Promise<Readable>;
+
+
     getManagementTableNames(): string[];
 
 
