@@ -1,13 +1,10 @@
 
-import { expect } from 'chai';
-import 'mocha';
-
 import { DataCell } from "../../src/lib/DataCell";
 
 
 describe('DataCell', () => {
 
-    context("constructor", () => {
+    describe("constructor", () => {
         it('should create a data cell.', () => {
             const dc = new DataCell(
                 "actor topic",

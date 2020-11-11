@@ -9,7 +9,8 @@
 		"test/**/*"
 	],
 	"compilerOptions": {
-		"target": "es5",
+		"target": "es6",
+		"module": "commonJS",
 		"esModuleInterop": true,
 		"downlevelIteration": true,
 		"removeComments": false,
@@ -19,9 +20,10 @@
 			"es2020.string"
 		],
 		"types": [
-			"mocha",
+			"jest",
 			"node"
 		]
 	},
 	"moduleResolution": "node"
 }
+
