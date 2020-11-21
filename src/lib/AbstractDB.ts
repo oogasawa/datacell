@@ -1,5 +1,4 @@
 
-
 import { DataCellStore } from "./DataCellStore";
 import { DataCell } from "./DataCell";
 import { NameConverter } from "./NameConverter";
@@ -281,7 +280,17 @@ export abstract class AbstractDB implements DataCellStore {
             await this._createTable(tableName);
         }
 
-        await this._addRow(tableName, objectID, value);
+        if (await this._hasID(tableName, objectID)) {
+            const values: string[] = await streamlib.streamToArray(
+                await this._getValues(tableName, objectID));
+
+            if (values.indexOf(value) < 0) {
+                await this._addRow(tableName, objectID, value);
+            }
+        }
+        else {
+            await this._addRow(tableName, objectID, value);
+        }
     }
 
 
@@ -294,7 +303,7 @@ export abstract class AbstractDB implements DataCellStore {
 
     /** @inheritdoc */
     async _putRowIfKeyIsAbsent(tableName: string, objectID: string, value: any): Promise<void> {
-        if (! await this._hasTable(tableName)) {
+        if (!await this._hasTable(tableName)) {
             await this._createTable(tableName);
         }
 
@@ -341,14 +350,14 @@ export abstract class AbstractDB implements DataCellStore {
 
 
     /** @inheritdoc */
-    abstract _deleteRow(tableName: string, id: string, value: string): Promise<void>;
+    abstract _deleteRows(tableName: string, id: string, value: string): Promise<void>;
 
 
 
     /** @inheritdoc */
-    async deleteRow(cell: DataCell): Promise<void> {
+    async deleteRows(cell: DataCell): Promise<void> {
         const tableName: string = await this.nameConverter.makeTableName(cell.category, cell.predicate);
-        return await this._deleteRow(tableName, cell.objectId, cell.value);
+        return await this._deleteRows(tableName, cell.objectId, cell.value);
     }
 
 

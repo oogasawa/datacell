@@ -2,6 +2,7 @@
 import { sprintf } from "sprintf-js";
 import { DataCellStore } from "./DataCellStore";
 import * as streamlib from "datacell-streamlib";
+import { Readable } from "stream";
 
 import * as log4js from "log4js";
 const logger = log4js.getLogger();
@@ -43,6 +44,11 @@ export class NameConverter {
         await this.store._createTable("ORIGINAL_NAME__INTERNAL_NAME");
         await this.store._createTable("INTERNAL_NAME__ORIGINAL_NAME");
         await this.store._createTable("INTERNAL_NAME__MAX_COUNT");
+
+
+        await this.setInternalName("ORIGINAL_NAME", "ORIGINAL_NAME");
+        await this.setInternalName("INTERNAL_NAME", "INTERNAL_NAME");
+        await this.setInternalName("MAX_COUNT", "MAX_COUNT");
     }
 
 
@@ -190,6 +196,9 @@ export class NameConverter {
         if (cList.length > 0) {
             count = parseInt(cList[0], 10);
         }
+        else {
+            count = 0;
+        }
 
         return count;
     }
@@ -257,5 +266,46 @@ export class NameConverter {
     }
 
 
+
+    async _report(dest: string) {
+        await this._reportTable(dest, "ORIGINAL_NAME__INTERNAL_NAME");
+        await this._reportTable(dest, "INTERNAL_NAME__ORIGINAL_NAME");
+        await this._reportTable(dest, "INTERNAL_NAME__MAX_COUNT");
+    }
+
+
+    async _reportTable(dest: string, tableName: string) {
+        // "ORIGINAL_NAME__INTERNAL_NAME",
+        // "INTERNAL_NAME__ORIGINAL_NAME",
+        // "INTERNAL_NAME__MAX_COUNT"
+        this._print(dest, "# " + tableName);
+        let r_stream: Readable = await this.store._getAllRows(tableName);
+        let line: Buffer = null;
+        for await (line of r_stream) {
+            this._print(dest, JSON.stringify(line));
+        }
+
+    }
+
+
+
+
+    /** Print a message to stdout (console.log) or logger (log4j.debug).
+     * 
+     * @param dest
+     * @param msg
+     */
+    _print(dest: string, msg: string): void {
+        switch (dest) {
+            case "stdout":
+                console.log(msg);
+                break;
+            case "debug":
+                logger.debug(msg);
+                break;
+            default:
+                break;
+        }
+    }
 
 }

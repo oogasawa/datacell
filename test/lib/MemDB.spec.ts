@@ -1,329 +1,520 @@
 
-
+import lineByLine from "n-readlines";
 import { MemDB } from "../../src/lib/MemDB";
 import { DataCell } from "../../src/lib/DataCell";
-import { TreeSet, Collections } from "typescriptcollectionsframework";
 import * as streamlib from "datacell-streamlib";
-import { Readable } from "stream";
+import { Readable, Transform, Writable } from "stream";
+
 
 import * as log4js from "log4js";
 const logger = log4js.getLogger();
 // logger.level = "debug";
 
-const data: string[][] = [
-    ["actor topic",
-        "20200520-004844-473575",
-        "category",
-        "actor topic"],
-    ["actor topic",
-        "20200520-004844-473575",
-        "destPath",
-        "isDaemonAlive"],
-    ["actor topic",
-        "20200520-004844-473575",
-        "name",
-        "stopDaemon"],
-    ["actor topic",
-        "20200520-004844-473575",
-        "ActorDef",
-        "EShellAD"],
-    ["actor topic",
-        "20200520-004844-473575",
-        "effect",
-        "{\"pre\": undefined, \"post_ex\": false }"]
-];
 
+
+
+function read_data(fname: string): object[] {
+
+    const result: object[] = [];
+
+    const liner = new lineByLine(fname);
+    let line: false | Buffer;
+    while (line = liner.next()) {
+        if (line.toString().length === 0) {
+            continue;
+        }
+        let row: string[] = line.toString().split("\t");
+        result.push(row);
+    }
+
+    return result;
+}
 
 
 describe('MemDB', () => {
 
     let dbObj: MemDB;
 
-    beforeAll(() => {
+    beforeAll(function() {
         dbObj = new MemDB();
     });
 
 
-    beforeEach(async () => {
+    beforeEach(async function() {
         await dbObj.connect();
     });
 
-    afterEach(async () => {
+    afterEach(async function() {
         await dbObj.disconnect();
     });
 
 
-    describe("constructor", () => {
+    describe("immediately after construction", function() {
 
-
-        it('immediately after construction, there are three management tables in the store.', async () => {
-            const tables: string[] = await streamlib.streamToArray(await dbObj.getAllTablesIncludingManagementTables());
-            expect(tables.length).toEqual(3);
+        afterEach(async function() {
+            await dbObj.deleteAllTables();
         });
 
 
-        it('immediately after construction, no tables should be contained in the store other than the management tables.', async () => {
+        test('#getAllTables should return an empty array.', async function() {
             const tables: string[] = await streamlib.streamToArray(await dbObj.getAllTables());
             expect(tables.length).toEqual(0);
         });
 
 
-        it('immediately after construction, getAllCategories() should return an empty array.', async () => {
+        test('#getAllCategories() should return an empty array.', async function() {
             const categories: string[] = await streamlib.streamToArray(await dbObj.getAllCategories());
-            // console.log(tables);
             expect(categories.length).toEqual(0);
         });
 
 
+        test('#getNameConverter() should return the NameConverter object associated with the dbObj.', function() {
+            const result = dbObj.getNameConverter();
+            expect(result.constructor.name).toEqual("NameConverter");
+        });
+
+
     });
 
 
-    describe("_putRow() and _deleteID()", () => {
+    describe("putting rows (small data)", () => {
 
-        it('immediately after the construction, there are three management tables in the store.', async () => {
-            await dbObj._putRow("ACTOR_TOPIC__ACTORDEF", "20200520-004844-473575", "EShellAD");
-            await dbObj._putRow("ACTOR_TOPIC__ACTORDEF", "20200520-004844-473575", "EShellAD2");
-            await dbObj._putRow("ACTOR_TOPIC__ACTORDEF", "20200101-000000-000000", "InterpreterAD");
+        let data: object[] = [];
+
+        beforeEach(async function() {
+
+            // Reads data from a file into an object array.
+            data = read_data("test/data.txt");
+        });
+
+
+        afterEach(async function() {
+            await dbObj.deleteAllTables();
+        });
+
+
+        test('#_addRow should be able to create duplicated data rows.', async () => {
+
+            const dc = new DataCell(data[0]);
+            const tableName = await dbObj.getNameConverter().makeTableName(data[0][0], data[0][2]);
+            await dbObj._createTable(tableName);
+            await dbObj._addRow(tableName, data[0][1], data[0][3]);
+            await dbObj._addRow(tableName, data[0][1], data[0][3]);
 
             // logger.level = "debug";
 
-            let result: string[] = await streamlib.streamToArray(await dbObj._getIDs("ACTOR_TOPIC__ACTORDEF"));
-            expect(result.length).toEqual(2);
+            let count = 0;
+            let rst: Readable = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
 
-            let rows: string[] = await streamlib.streamToArray(await dbObj._getAllRows("ACTOR_TOPIC__ACTORDEF"));
-            expect(rows.length).toEqual(3);
+            for await (let dc of rst) {
+                count++;
+                logger.debug("#_addRow test : " + JSON.stringify(dc));
+            }
+            expect(count).toEqual(2);
 
-            // logger.debug("_putRow and _deleteID : " + JSON.stringify(result));
-
-            await dbObj._deleteID("ACTOR_TOPIC__ACTORDEF", "20200520-004844-473575");
-
-            result = await streamlib.streamToArray(await dbObj._getIDs("ACTOR_TOPIC__ACTORDEF"));
-            expect(result.length).toEqual(1);
-
-            rows = await streamlib.streamToArray(await dbObj._getAllRows("ACTOR_TOPIC__ACTORDEF"));
-            expect(rows.length).toEqual(1);
-
+            logger.level = "error";
         });
 
-    });
 
+        test('#addRow : DataCell version of #_addRow', async () => {
 
-    describe("getAllTables()", () => {
+            const dc = new DataCell(data[0]);
+            const tableName = await dbObj.getNameConverter()
+                .makeTableName(data[0][0], data[0][2]);
+            await dbObj._createTable(tableName);
+            await dbObj.addRow(new DataCell(data[0]));
+            await dbObj.addRow(new DataCell(data[0]));
 
-        it('should be able to add a row.', async () => {
-            const dc0 = new DataCell(data[0]);
-
-            let tables: string[] = await streamlib.streamToArray(await dbObj.getAllTables());
-            expect(tables.length).toEqual(0);
-
-            await dbObj.putRow(dc0);
-
-            tables = await streamlib.streamToArray(await dbObj.getAllTables());
-            expect(tables.length).toEqual(1);
-
-            const dc1 = new DataCell(data[1]);
-            await dbObj.putRow(dc1);
-
-            tables = await streamlib.streamToArray(await dbObj.getAllTables());
-            expect(tables.length).toEqual(2);
-
-
-            const dc2 = new DataCell(data[2]);
-            await dbObj.putRow(dc2);
-
-            tables = await streamlib.streamToArray(await dbObj.getAllTables());
-            expect(tables.length).toEqual(3);
-
-            await dbObj.putRow(dc2);
-
-            tables = await streamlib.streamToArray(await dbObj.getAllTables());
-            expect(tables.length).toEqual(3);
             // logger.level = "debug";
-            // logger.debug(tables);
-            // logger.level = "error";
+
+            let count = 0;
+            let rst: Readable = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                count++;
+                logger.debug("#_addRow test : " + JSON.stringify(dc));
+            }
+            expect(count).toEqual(2);
+
+            logger.level = "error";
+        });
+
+
+
+        test('#putRow should be able to create duplicated data rows.', async () => {
+
+            // Load a row into the array with duplication.
+            await dbObj.putRow(new DataCell(data[0]));
+            await dbObj.putRow(new DataCell(data[0]));
+
+            let count = 0;
+            const dc = new DataCell(data[0]);
+            let rst: Readable = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                count++;
+            }
+            expect(count).toEqual(2);
 
         });
+
+
+        test('#putRowIfKeyIsAbsent', async () => {
+
+            // Load a row into the array with duplication.
+            await dbObj.putRowIfKeyIsAbsent(new DataCell(data[0]));
+            await dbObj.putRowIfKeyIsAbsent(new DataCell(data[0]));
+
+            let count = 0;
+            const dc = new DataCell(data[0]);
+            let rst: Readable = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                count++;
+            }
+            expect(count).toEqual(1);
+
+            await dbObj.putRowIfKeyIsAbsent(
+                new DataCell(data[0][0],
+                    data[0][1],
+                    data[0][2],
+                    "another value"));
+
+
+            count = 0;
+            let result: string = null;
+            rst = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                const { category, objectId, predicate, value } = dc;
+                result = value;
+                count++;
+            }
+            expect(count).toEqual(1);
+            expect(result).toEqual(data[0][3]);
+
+        });
+
+
+        test('#putRowIfKeyValuePairIsAbsent', async () => {
+
+            // Load a row into the array with duplication.
+            await dbObj.putRowIfKeyValuePairIsAbsent(new DataCell(data[0]));
+            await dbObj.putRowIfKeyValuePairIsAbsent(new DataCell(data[0]));
+
+            let count = 0;
+            const dc = new DataCell(data[0]);
+            let rst: Readable = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                count++;
+            }
+            expect(count).toEqual(1);
+
+            await dbObj.putRowIfKeyValuePairIsAbsent(
+                new DataCell(data[0][0],
+                    data[0][1],
+                    data[0][2],
+                    "another value"));
+
+
+            count = 0;
+            let result: string = null;
+            rst = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                const { category, objectId, predicate, value } = dc;
+                result = value;
+                count++;
+            }
+            expect(count).toEqual(2);
+            expect(result).toEqual("another value");
+
+        });
+
+
+
+        test('#putRowWithReplacingValue', async () => {
+
+            // Load a row into the array with duplication.
+            await dbObj.putRowWithReplacingValue(new DataCell(data[0]));
+            await dbObj.putRowWithReplacingValue(new DataCell(data[0]));
+
+            let count = 0;
+            const dc = new DataCell(data[0]);
+            let rst: Readable = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                count++;
+            }
+            expect(count).toEqual(1);
+
+            await dbObj.putRowWithReplacingValue(
+                new DataCell(data[0][0],
+                    data[0][1],
+                    data[0][2],
+                    "another value"));
+
+
+            count = 0;
+            let result: string = null;
+            rst = await dbObj.getAllRows(dc);
+            rst.pipe(new streamlib.DevNull());
+            for await (let dc of rst) {
+                const { category, objectId, predicate, value } = dc;
+                result = value;
+                count++;
+            }
+            expect(count).toEqual(1);
+            expect(result).toEqual("another value");
+
+        });
+
 
     });
 
 
-    describe("getAllCategories", () => {
 
-        it('should be able to add a row.', async () => {
-            const dc0 = new DataCell(data[0]);
+    describe("Iteration over a table", () => {
 
-            let tables: string[] = await streamlib.streamToArray(await dbObj.getAllTables());
-            expect(tables.length).toEqual(0);
+        let data: object[] = [];
 
-            await dbObj.putRow(dc0);
+        beforeEach(async function() {
 
-            tables = await streamlib.streamToArray(await dbObj.getAllTables());
-            expect(tables.length).toEqual(1);
+            // Reads data from a file into an object array.
+            data = read_data("test/data.txt");
+            for (let row of data) {
+                logger.debug("#putRow: row = " + row);
+                await dbObj.putRow(new DataCell(row));
+            }
+        });
 
-            const c: string[] = await streamlib.streamToArray(await dbObj.getAllCategories());
-            expect(c.length).toEqual(1);
-            expect(c[0]).toEqual("actor topic");
+
+        afterEach(async function() {
+            await dbObj.deleteAllTables();
+        });
+
+
+
+        afterEach(async function() {
+            await dbObj.deleteAllTables();
+        });
+
+
+        test('#_getAllRows should return all rows in a table', async () => {
+
+            // logger.level = "debug";
+            const tableName: string
+                = await dbObj.getNameConverter()
+                    .makeTableName(data[0][0], data[0][2]);
+
+
+            async function experiment(tableName, rowNum) {
+
+                // Definition of a Readable stream.
+                // let categorySet = new Set<string>();
+                // let objectIdSet = new Set<string>();
+                // let predicateSet = new Set<string>();
+                const rst: Readable = await dbObj._getAllRows(tableName);
+                let counter = 0;
+                rst
+                    .pipe(new Transform({
+                        readableObjectMode: true,
+                        writableObjectMode: true,
+                        transform(chunk, encode, done) {
+                            counter++;
+                            const { category, objectId, predicate, value } = chunk;
+                            // categorySet.add(category);
+                            // objectIdSet.add(objectId);
+                            // predicateSet.add(predicate);
+                            // this.push(chunk);
+                            done();
+                        }
+                    }))
+                    .pipe(new streamlib.DevNull());
+
+                // Making the stream run.
+                let counter2 = 0;
+                let obj = null;
+                for await (obj of rst) {
+                    counter2++;
+                }
+
+                // expect(categorySet.size).toEqual(1);
+                // expect(objectIdSet.size).toEqual(1);
+                // expect(predicateSet.size).toEqual(1);
+                expect(counter).toEqual(rowNum);
+                expect(counter2).toEqual(rowNum);
+            }
+            logger.level = "error";
+
+
+            await experiment("FEATURE__Q_ORGANISM", 1);
+            await experiment("FEATURE__Q_LOCUS_TAG", 20);
+
 
         });
 
 
-    });
 
+        test('#getAllRows is the DataCell version of #_getAllRows', async () => {
 
-    describe("getAllRows", () => {
+            // logger.level = "debug";
+            const tableName: string
+                = await dbObj.getNameConverter()
+                    .makeTableName(data[0][0], "Q_locus_tag");
 
-        it('should return zero element stream.', async () => {
-            const result: DataCell[] = [];
-            const r_stream: Readable = await dbObj.getAllRows(new DataCell("dummy_category", "", "dummy_pred", ""));
-            for await (const dc of r_stream) {
-                result.push(dc);
+            // Definition of a Readable stream.
+            let categorySet = new Set<string>();
+            let objectIdSet = new Set<string>();
+            let predicateSet = new Set<string>();
+            const rst: Readable = await dbObj.getAllRows(
+                new DataCell(data[0][0], "", "Q_locus_tag", ""));
+            rst
+                .pipe(new Transform({
+                    readableObjectMode: true,
+                    writableObjectMode: true,
+                    transform(chunk, encode, done) {
+                        const { category, objectId, predicate, value } = chunk;
+                        categorySet.add(category);
+                        objectIdSet.add(objectId);
+                        predicateSet.add(predicate);
+                        // this.push(chunk);
+                        done();
+                    },
+                    flush(done) {
+                        done();
+                    }
+                }))
+                .pipe(new streamlib.DevNull());
+
+            // Making the stream run.
+            let obj = null;
+            for await (obj of rst) {
+                ;
             }
 
-            expect(result.length).toEqual(0);
+            expect(categorySet.size).toEqual(1);
+            expect(objectIdSet.size).toEqual(20);
+            expect(predicateSet.size).toEqual(1);
+
+            logger.level = "error";
+
         });
 
 
-        it('should reject addition of the same objectID / value pairs.', async () => {
-            const dc1 = new DataCell(data[0]);
-            await dbObj.putRow(dc1);
-            await dbObj.putRow(dc1); // trying to add the same row (which should be rejected).
-            await dbObj.putRow(dc1); // trying to add the same row (which should be rejected).
 
-            // returning all rows in the "actor_topic__category" table.
-            const result: DataCell[] = [];
-            const r_stream: Readable = await dbObj.getAllRows(dc1);
-            for await (const dc of r_stream) {
-                result.push(dc);
+        test('#getAllCategories returns all categories in the database', async () => {
+
+            const c: string[] = await streamlib.streamToArray(
+                await dbObj.getAllCategories());
+
+            expect(c.length).toEqual(2);
+            expect(c[0]).toEqual("feature");
+            expect(c[1]).toEqual("entry");
+
+        });
+
+
+
+        test('#_getIDs returns all IDs in a table', async () => {
+
+            async function experiment(tableName, count) {
+
+                // Definition of a Readable stream.
+                let objectIdSet = new Set<string>();
+                const rst: Readable = await dbObj._getIDs(tableName);
+                rst
+                    .pipe(new Transform({
+                        readableObjectMode: true,
+                        writableObjectMode: true,
+                        highWaterMark: 16,
+                        transform(chunk, encode, done) {
+                            const str = chunk.toString();
+                            objectIdSet.add(str);
+                            this.push(chunk);
+                            done();
+                        }
+                    }))
+                    .pipe(new streamlib.DevNull());
+
+
+                // Making the stream run.
+                let obj = null;
+                for await (obj of rst) {
+                    ;
+                }
+
+                // Testing the result.
+                // logger.level = "debug";
+                // logger.debug(objectIdSet);
+                // logger.level = "error";
+
+                expect(objectIdSet.size).toEqual(count);
+
+
             }
 
-            expect(result.length).toEqual(1);
-            expect(result[0].category).toEqual(data[0][0]);
-            expect(result[0].objectId).toEqual(data[0][1]);
-            expect(result[0].predicate).toEqual(data[0][2]);
-            expect(result[0].value).toEqual(data[0][3]);
+
+            // logger.level = "debug";
+            const tableName: string
+                = await dbObj.getNameConverter()
+                    .makeTableName(data[0][0], data[0][2]);
+
+            await experiment(tableName, 1);
+            await experiment("FEATURE__Q_LOCUS_TAG", 20);
 
         });
 
 
+        test('#_getPredicates returns all predicates related to an objectId', async () => {
 
-        it('should accept DataCells with the same objectID and different values.', async () => {
+            logger.level = "debug";
+            async function experiment(category, objectIds, count) {
 
-            const dc0 = new DataCell(data[0]);
-            const dc1 = new DataCell(data[1]);
-            const dc2 = new DataCell(data[2]);
-            const dc3 = new DataCell(data[0][0], data[0][1], data[0][2], "another value");
-            await dbObj.putRow(dc0);
-            await dbObj.putRow(dc1);
-            await dbObj.putRow(dc2);
-            await dbObj.putRow(dc3);
+                // Definition of a Readable stream.
+                let predicateSet = new Set<string>();
+                const rst: Readable
+                    = await dbObj._getPredicates(category, objectIds);
+
+                let counter = 0;
+                rst
+                    .pipe(new Transform({
+                        readableObjectMode: true,
+                        writableObjectMode: true,
+                        highWaterMark: 16,
+                        transform(chunk, encode, done) {
+                            const str = chunk.toString();
+                            predicateSet.add(str);
+                            counter++;
+                            this.push(chunk);
+                            done();
+                        }
+                    }))
+                    .pipe(new streamlib.DevNull());
 
 
-            // returning all rows in the "actor_topic__category" table.
-            const result: DataCell[] = [];
-            const r_stream: Readable = await dbObj.getAllRows(dc0);
-            for await (const dc of r_stream) {
-                result.push(dc);
+                // Making the stream run.
+                let obj = null;
+                for await (obj of rst) {
+                    ;
+                }
+
+                // Testing the result.
+                logger.level = "debug";
+                logger.debug(predicateSet);
+
+                expect(predicateSet.size).toEqual(count);
             }
 
-            expect(result.length).toEqual(2);
-            expect(result[0].category).toEqual(data[0][0]);
-            expect(result[0].objectId).toEqual(data[0][1]);
-            expect(result[0].predicate).toEqual(data[0][2]);
-            expect(result[0].value).toEqual(data[0][3]);
-            expect(result[1].category).toEqual(data[0][0]);
-            expect(result[1].objectId).toEqual(data[0][1]);
-            expect(result[1].predicate).toEqual(data[0][2]);
-            expect(result[1].value).toEqual("another value");
 
 
-            // expect(dbObj.getAllTables().length).toEqual(3);
-            // const result: DataCell[] = dbObj.getAllRows(dc1); // gets all rows in the "actor_topic__category" table.
-            // expect(result.length).toEqual(2);
-        });
-
-
-    });
-
-
-    describe("putRowIfKeyIsAbsent", () => {
-
-        it('should create table if it is absent.', async () => {
-            const dc1 = new DataCell(data[0]);
-            await dbObj.putRowIfKeyIsAbsent(dc1);
-
-            const c: string[] = await streamlib.streamToArray(await dbObj.getAllCategories());
-            expect(c.length).toEqual(1);
-            expect(c[0]).toEqual("actor topic");
+            await experiment("feature", JSON.stringify({ "accession": "CP020762", "feature": "source", "range": "1..2546158" }), 10);
+            logger.level = "error";
 
         });
 
-
-        it('should reject new value when the same key exists.', async () => {
-
-            const dc1 = new DataCell(data[0][0], data[0][1], data[0][2], data[0][3]);
-            const dc2 = new DataCell(data[0][0], data[0][1], data[0][2], "another value");
-            await dbObj.putRowIfKeyIsAbsent(dc1);
-            await dbObj.putRowIfKeyIsAbsent(dc2);
-
-            const r_stream: Readable = await dbObj.getAllRows(dc1);
-            let dc: DataCell = null;
-            let counter = 0;
-            for await (dc of r_stream) {
-                expect(dc.category).toEqual(data[0][0]);
-                expect(dc.value).toEqual(data[0][3]);
-                counter++;
-            }
-            expect(counter).toEqual(1);
-        });
-
-
-    });
-
-
-
-    describe("putRowIfKeyValuePairIsAbsent", () => {
-
-
-        it('should create table if it is absent.', async () => {
-            const dc1 = new DataCell(data[0]);
-            await dbObj.putRowIfKeyValuePairIsAbsent(dc1);
-
-            const c: string[] = await streamlib.streamToArray(await dbObj.getAllCategories());
-            expect(c.length).toEqual(1);
-            expect(c[0]).toEqual("actor topic");
-
-        });
-
-
-        it('should store both values when the same key exists.', async () => {
-            const dc1 = new DataCell(data[0][0], data[0][1], data[0][2], data[0][3]);
-            const dc2 = new DataCell(data[0][0], data[0][1], data[0][2], "another value");
-            await dbObj.putRowIfKeyValuePairIsAbsent(dc1);
-            await dbObj.putRowIfKeyValuePairIsAbsent(dc2);
-
-            const r_stream: Readable = await dbObj.getAllRows(dc1); // gets all rows in the "actor_topic__category" table.
-            let dc: DataCell = null;
-            let counter = 0;
-            const result: DataCell[] = [];
-            for await (dc of r_stream) {
-                result.push(dc);
-                counter++;
-            }
-            expect(counter).toEqual(2);
-
-            const set1: TreeSet<string> = new TreeSet<string>(Collections.getStringComparator());
-            const set2: TreeSet<string> = new TreeSet<string>(Collections.getStringComparator());
-            set1.add(data[0][3]);
-            set1.add("another value");
-            set2.add(result[0].value);
-            set2.add(result[1].value);
-
-            const msg: string = set1.toJSON().toString() + "\t" + set2.toJSON().toString();
-
-            expect(set1.toJSON().toString() === set2.toJSON().toString()).toBeTruthy;
-
-
-        });
 
 
     });
@@ -332,3 +523,7 @@ describe('MemDB', () => {
 
 
 });
+
+
+
+

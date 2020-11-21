@@ -109,9 +109,9 @@ export interface DataCellStore {
 	 *
 	 * @param tableName
 	 * @param objectID
-	 * @return An array of values.
-	 * If the given table does not exist, or the given objectID is not in the table, 
-	 * this method returns an empty array, <code>[]</code>
+	 * @return A Promise of Readable stream of strings.
+	 * If the given table does not exist, or the given objectID is not in the table,
+	 * this method returns a promise of <code>Readable.from([])</code>.
 	 */
     _getValues(tableName: string, objectID: string): Promise<Readable>;
 
@@ -256,10 +256,10 @@ export interface DataCellStore {
     putRowWithReplacingValue(cell: DataCell): Promise<void>;
 
 
-    _deleteRow(tableName: string, objectID: string, value: string): Promise<void>;
+    _deleteRows(tableName: string, objectID: string, value: string): Promise<void>;
 
 
-    deleteRow(cond: DataCell): Promise<void>;
+    deleteRows(cond: DataCell): Promise<void>;
 
 
     _deleteID(tableName: string, objectID: string): Promise<string>;

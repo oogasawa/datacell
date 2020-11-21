@@ -1,6 +1,7 @@
 
 import { DuplicatedKeyUniqueValueHashMap } from "datacell-collections";
 import { AbstractDB } from "./AbstractDB";
+import { MemDbTable } from "./MemDbTable";
 import { DataCell } from "./DataCell";
 import { Readable, Transform } from "stream";
 import * as streamlib from "datacell-streamlib";
@@ -13,13 +14,7 @@ const logger = log4js.getLogger();
 
 export class MemDB extends AbstractDB {
 
-    // dbName: string;
-
-    // tableName => DuplicatedKeyUniqueValueHashMap(id, value)
-    tables: Map<string, DuplicatedKeyUniqueValueHashMap<string, string>>;
-
-
-    // nameConverter: NameConverter;
+    tables: Map<string, MemDbTable>;
 
     constructor() {
         super();
@@ -27,9 +22,8 @@ export class MemDB extends AbstractDB {
 
 
     async connect(arg?: object): Promise<void> {
-        this.tables = new Map<string, DuplicatedKeyUniqueValueHashMap<string, string>>();
+        this.tables = new Map<string, MemDbTable>();
         this.nameConverter.init(this);
-        // nothing to do.
     }
 
     async disconnect(): Promise<void> {
@@ -45,8 +39,8 @@ export class MemDB extends AbstractDB {
             return tableName;
         }
         else {
-            const kvMap = new DuplicatedKeyUniqueValueHashMap<string, any>();
-            this.tables.set(tableName, kvMap);
+            const table = new MemDbTable();
+            this.tables.set(tableName, table);
 
             return tableName;
         }
@@ -61,15 +55,6 @@ export class MemDB extends AbstractDB {
     }
 
 
-    /** @inheritdoc */
-    async hasTable(cond: DataCell): Promise<boolean> {
-        const tableName: string
-            = await this.nameConverter
-                .makeTableName(cond.category, cond.predicate);
-
-        return await this._hasTable(tableName);
-    }
-
 
     /** @inheritdoc */
     async _deleteTable(tableName: string): Promise<string> {
@@ -79,16 +64,6 @@ export class MemDB extends AbstractDB {
         }
         else {
             return null;
-        }
-    }
-
-
-
-    /** @inheritdoc */
-    async deleteAllTables(): Promise<void> {
-        const ks: IterableIterator<string> = this.tables.keys();
-        for (const k of ks) {
-            await this._deleteTable(k);
         }
     }
 
@@ -120,20 +95,19 @@ export class MemDB extends AbstractDB {
     /** @inheritdoc */
     async _getIDs(tableName: string): Promise<Readable> {
 
-        const hashmap: DuplicatedKeyUniqueValueHashMap<string, string> = this.tables.get(tableName);
-        const ks: Set<string> = hashmap.keySet();
-
-        const iter: IterableIterator<string> = ks.values();
+        const table: MemDbTable = this.tables.get(tableName);
+        const idIter: IterableIterator<string> = table.keys();
 
         return new Readable({
             objectMode: true,
             read() {
-                const k: IteratorResult<string> = iter.next();
-                if (!k.done) {
-                    this.push(k.value);
+                const idObj: IteratorResult<string> = idIter.next();
+                if (idObj.done) {
+                    this.push(null);
                 }
                 else {
-                    this.push(null);
+                    const id: string = idObj.value;
+                    this.push(id);
                 }
             }
         });
@@ -154,7 +128,7 @@ export class MemDB extends AbstractDB {
                 return await this.nameConverter.getOriginalName(names[0]) === category;
             }))
             .pipe(new streamlib.Filter((tableName) => {
-                return this.tables.get(tableName).keySet().has(objectID);
+                return this.tables.get(tableName).has(objectID);
             }))
             .pipe(new streamlib.Map(async (tableName) => {
                 // names = [category, predicate]
@@ -167,96 +141,45 @@ export class MemDB extends AbstractDB {
     }
 
 
-    /** @inheritdoc */
-    getPredicates(cond: DataCell): Promise<Readable> {
-        return this._getPredicates(cond.category, cond.objectId);
-    }
-
-
 
     /** @inheritdoc */
     async _getValues(tableName: string, objectID: string): Promise<Readable> {
 
-        let valueSet: Set<any> = null;
-        let iter: IterableIterator<string> = null;
+        const hasTable: boolean = await this._hasTable(tableName);
+        const hasId: boolean = await this._hasID(tableName, objectID);
 
-        // logger.debug("MemDB::_getValues() : tableName = " + tableName);
-        // logger.debug("MemDB::_getValues() : objectID = " + objectID);
-
-        if (await this._hasTable(tableName) && await this._hasID(tableName, objectID)) {
-            valueSet = this.tables.get(tableName).get(objectID);
-            iter = valueSet.keys();
+        if (!hasTable || !hasId) {
+            return Readable.from([]);
         }
 
-        return new Readable({
-            objectMode: true,
-            read() {
-                if (valueSet === null) {
-                    this.push(null);
-                }
-                else {
-                    const v: IteratorResult<string> = iter.next();
-                    if (v.done) {
-                        this.push(null);
-                    }
-                    else {
-                        this.push(v.value);
-                    }
-                }
-            }
-        });
-
+        const values: string[] = this.tables.get(tableName).get(objectID);
+        return Readable.from(values);
     }
+
 
 
 
     /** @inheritdoc */
-    async getValues(cond: DataCell): Promise<Readable> {
-        const tableName: string
-            = await this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getValues(tableName, cond.objectId);
-    }
+    async _getRows(tableName: string, objectID: string): Promise<Readable> {
+        // This method returns a Promise of a Readable stream of DataCell objects.
 
+        const r_stream: Readable = await this._getAllRows(tableName);
 
-
-    /** @inheritdoc */
-    async _getRows(tableName: string, objectID: string): Promise<Readable> { // DataCell[] {
-
-        const names: string[] = this.nameConverter.parseTableName(tableName);
-        const category: string = await this.nameConverter.getOriginalName(names[0]);
-        const predicate: string = await this.nameConverter.getOriginalName(names[1]);
-
-        const valueSet: Set<string> = this.tables.get(tableName).get(objectID);
-        const iter: IterableIterator<string> = valueSet.keys();
-
-        return new Readable({
-            objectMode: true,
-            read() {
-                if (valueSet === null) {
-                    this.push(null);
-                }
-                else {
-                    const value: IteratorResult<string> = iter.next();
-                    if (value.done) {
-                        this.push(null);
+        const oID = objectID; // renaming the variable for readability.
+        return r_stream
+            .pipe(new Transform({
+                readableObjectMode: true,
+                writableObjectMode: true,
+                transform(chunk, encode, done) {
+                    let { category, objectId, predicate, value } = chunk;
+                    if (objectId === oID) {
+                        this.push(new DataCell(category, objectId, predicate, value));
                     }
-                    else {
-                        this.push(new DataCell(category, objectID, predicate, value.value));
-                    }
+                    done();
                 }
-            }
-        });
-
+            }));
     }
 
-
-
-    /** @inheritdoc */
-    async getRows(cond: DataCell): Promise<Readable> {
-        const tableName: string
-            = await this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._getRows(tableName, cond.objectId);
-    }
 
 
 
@@ -264,50 +187,25 @@ export class MemDB extends AbstractDB {
     async _getAllRows(tableName: string): Promise<Readable> { // Returns Readable stream of DataCell objects.
 
         const names: string[] = this.nameConverter.parseTableName(tableName);
+        logger.debug("names: " + names);
+
+        // there is no original name against the maintainance tables,
+        // because those tables are not created by calling DataCellStore's put methods.
         const category: string = await this.nameConverter.getOriginalName(names[0]);
         const predicate: string = await this.nameConverter.getOriginalName(names[1]);
+        logger.debug("category: " + category);
+        logger.debug("predicate: " + predicate);
 
 
-        let r_stream: Readable = null;
-        if (await this._hasTable(tableName)) {
-            r_stream = await this._getIDs(tableName);
-        }
-        else {
-            r_stream = Readable.from([]);
-        }
-
-        return r_stream
-            // It should be noted that this map function returns Promise objects.
-            .pipe(new streamlib.Map(async (id) => {
-                const values: string[] = await streamlib.streamToArray(await this._getValues(tableName, id));
-                const result: [string, string[]] = [id, values];
-                return result;
-            }))
-            // Transform Promise<[string, string[]]> to [string, string[]].
+        return this.tables.get(tableName)
+            .getAllRows()
             .pipe(new Transform({
-                defaultEncoding: 'utf8',
                 readableObjectMode: true,
                 writableObjectMode: true,
-                async transform(chunk: Promise<[string, string[]]>, encoding: string, cb: Function) {
-                    this.push(await chunk);
-                    cb();
-                },
-                flush(cb: Function) {
-                    cb();
-                }
-            }))
-            .pipe(new Transform({
-                defaultEncoding: 'utf8',
-                readableObjectMode: true,
-                writableObjectMode: true,
-                transform(chunk: [string, string[]], encoding: string, cb: Function) {
-                    for (const v of chunk[1]) {
-                        this.push(new DataCell(category, chunk[0], predicate, v));
-                    }
-                    cb();
-                },
-                flush(cb: Function) {
-                    cb();
+                transform(chunk, encode, done) {
+                    let { id, value } = chunk;
+                    this.push(new DataCell(category, id, predicate, value));
+                    done();
                 }
             }));
 
@@ -315,75 +213,49 @@ export class MemDB extends AbstractDB {
 
 
 
-
-
     /** @inheritdoc */
     async _hasID(tableName: string, objectID: string): Promise<boolean> {
-
-        // logger.debug("MemDB::_hasID() : tableName = " + tableName);
-        // logger.debug("MemDB::_hasID() : objectID = " + objectID);
 
         if (!await this._hasTable(tableName)) {
             return false;
         }
         else {
-            const valueSet: Set<string> = this.tables.get(tableName).get(objectID);
-
-            if (valueSet !== undefined && valueSet.size > 0) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return this.tables.get(tableName).has(objectID);
         }
     }
 
 
-    /** @inheritdoc */
-    async hasID(cond: DataCell): Promise<boolean> {
-        const tableName: string = await this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return this._hasID(tableName, cond.objectId);
-    }
 
 
     /** @inheritdoc */
     async _hasRow(tableName: string, objectID: string, value: string): Promise<boolean> {
 
-        if (!await this._hasTable(tableName) || ! await this._hasID(tableName, objectID)) {
+        const hasTable: boolean = await this._hasTable(tableName);
+        const hasId: boolean = await this._hasID(tableName, objectID);
+
+        if (!hasTable || !hasId) {
             return false;
         }
 
-
-        const valueSet: Set<string> = this.tables.get(tableName).get(objectID);
-
-        const iter: IterableIterator<string> = valueSet.keys();
-        const v: IteratorResult<string> = iter.next();
-        while (!v.done) {
-            if (v.value === value) {
-                return true;
-            }
+        const values: string[] = this.tables.get(tableName).get(objectID);
+        if (values === null) {
+            return false;
         }
-
-        return false;
-    }
-
-
-    /** @inheritdoc */
-    async hasRow(cond: DataCell): Promise<boolean> {
-        const tableName: string = await this.nameConverter.makeTableName(cond.category, cond.predicate);
-        return await this._hasRow(tableName, cond.objectId, cond.value);
+        else {
+            return values.indexOf(value) >= 0;
+        }
     }
 
 
 
 
     /** @inheritdoc */
-    async _addRow(tableName: string, objectID: string, value: any): Promise<void> {
+    async _addRow(tableName: string, objectID: string, value: string): Promise<void> {
 
         // This method assumes that the table has already existed.
 
-        if (this.tables.get(tableName).containsKey(objectID)) {
-            this.tables.get(tableName).get(objectID).add(value);
+        if (this.tables.get(tableName).has(objectID)) {
+            this.tables.get(tableName).get(objectID).push(value);
         }
         else {
             this.tables.get(tableName).put(objectID, value);
@@ -399,19 +271,32 @@ export class MemDB extends AbstractDB {
 
 
 
-
-
     /** @inheritdoc */
-    async _deleteRow(tableName: string, id: string, value: string): Promise<void> {
-        this.tables.get(tableName).get(id).delete(value);
+    async _deleteRows(tableName: string, id: string, value: string): Promise<void> {
+
+        // (id, value) pairs can be exist more than one.
+        // This method removes all the (id, value) pairs.
+
+
+        if (this.tables.get(tableName).has(id)) {
+            const values: string[] = this.tables.get(tableName).get(id);
+            const newValues: string[] = [];
+
+            values.forEach((v) => {
+                if (v !== value) {
+                    newValues.push(v);
+                }
+            });
+
+            this.tables.get(tableName).set(id, newValues);
+        }
     }
 
 
 
     async _categoryToObjectIDs(category: string): Promise<Readable> {
 
-        // tableName => DuplicatedKeyUniqueValueHashMap(id, value)
-        const tableObj: Map<string, DuplicatedKeyUniqueValueHashMap<string, string>> = this.tables;
+        const tableObj: Map<string, MemDbTable> = this.tables;
 
         const r_stream: Readable = await this.getAllTables();
 
@@ -426,16 +311,25 @@ export class MemDB extends AbstractDB {
                 defaultEncoding: 'utf8',
                 readableObjectMode: true,
                 writableObjectMode: true,
-                transform(tableName, encoding, cb) {
+                transform(tableName, encoding, done) {
                     // ImmutableSet of objectIDs.
-                    const ks: Set<string> = tableObj.get(tableName).keySet();
-                    ks.forEach((k) => {
-                        this.push(k);
-                    });
-                    cb();
+                    const idIter: IterableIterator<string> = tableObj.get(tableName).keys();
+
+                    while (true) {
+                        const idObj = idIter.next();
+                        if (idObj.done) {
+                            this.push(null);
+                            break;
+                        }
+                        else {
+                            this.push(idObj.value);
+                        }
+                    }
+                    done();
                 },
-                flush(cb) {
-                    cb();
+                flush(done) {
+                    this.push(null);
+                    done();
                 }
             }));
 

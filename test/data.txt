@@ -1,0 +1,198 @@
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_organism	"Staphylococcus lugdunensis"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_mol_type	"genomic DNA"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_strain	"VISLISI_21"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_isolation_source	"blood culture"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_host	"Homo sapiens"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_db_xref	"taxon:28035"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_country	"France: strasbourg"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_lat_lon	"48.35 N 7.44 E"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_collection_date	"2015-08"
+feature	{"accession":"CP020762","feature":"source","range":"1..2546158"}	Q_collected_by	"Xavier Argemi"
+feature	{"accession":"CP020762","feature":"gene","range":"complement(295..510)"}	Q_locus_tag	"B7466_00005"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_locus_tag	"B7466_00005"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_002460975.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_product	"hypothetical protein"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_protein_id	"ARJ10198.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(295..510)"}	Q_translation	"MIYIDQASPLIYCSAVEAHVQEHEQLQEHEQLQEQQPPAYCIAS\nELLMSEYPLIEWLLIFIIFHLLLPNNK"
+feature	{"accession":"CP020762","feature":"gene","range":"538..1401"}	Q_locus_tag	"B7466_00010"
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_locus_tag	"B7466_00010"
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_000444787.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_product	"ABC transporter ATP-binding protein"
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_protein_id	"ARJ10199.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"538..1401"}	Q_translation	"MESLMTIKDLKVDINNRKILNLNNSTINIYSEDKIALIGKNGAG\nKTTLINCLLNEINYSGVIDRKISSKDIGIVFQENKYGDLIKVHELIYLATAYSKRSEQ\nFKAFTKAFSLEHLINKFVKDLSLGEQKRLTVGLVLNKQKKLYIFDELTSGLDYEKRQN\nLLQKTKEITQNKAVIKITHYFDEVENWANKLIILDKGELLYYGSIDQFFSKFYHYALI\nEIVNQELDHLVRDDIENINADVYFNAKIVTHNKEQMNDVINILNERKIEFKINMQNIY\nSTYLISTLEEI"
+feature	{"accession":"CP020762","feature":"gene","range":"1398..2132"}	Q_locus_tag	"B7466_00015"
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_locus_tag	"B7466_00015"
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_000608683.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_product	"ABC transporter permease"
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_protein_id	"ARJ10200.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"1398..2132"}	Q_translation	"MINKILLSIKMQFRVPISVFFSLIFPIIMMLVIIMSYGNFSIGN\nGRHFIDKYFLISTSIGLLPIAFISFPIWLSESIENDTLKRLKYFDVNISSLIVSNIIS\nYCFLAIFSVILNIIIGKVFFSLTLPNTQYFIAFFLQIFYNIIALLMIGTFLALLIRKS\nKVLLPFGMILLFLTYMIIGVFVQYGELPNVLKEIGNWIPIKYATNDFYSIWTNERMWD\nVSFLKLNSLYIVVTGVLSLCIYKFKK"
+feature	{"accession":"CP020762","feature":"gene","range":"2144..2437"}	Q_locus_tag	"B7466_00020"
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_locus_tag	"B7466_00020"
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_000919986.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_product	"hypothetical protein"
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_protein_id	"ARJ10201.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"2144..2437"}	Q_translation	"MLKRQEMRVIIEILAGIVLSAIITAISISIGYFIINKNGYAHFD\nVNLLGLNLYKIHNHGDSGEPIITNIMFLGVALSILLVIIIELLVATKKRGKKQ"
+feature	{"accession":"CP020762","feature":"gene","range":"2434..3312"}	Q_locus_tag	"B7466_00025"
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_locus_tag	"B7466_00025"
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_002492035.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_product	"dehydrogenase"
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_protein_id	"ARJ10202.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"2434..3312"}	Q_translation	"MINYQLKGMFNQHSLFKLNDDNIANNDNRNNFAQIILGNQESES\nLKYLLNVNHQRLSDFKSMLAYNESNYAALVNEHQMLNEIKDEDTRSLPKSDKKIKESF\nYNVLNHRKSTREFTSFEMASKELSTILKFSFGIAPRKVEYGDIKTSTRFYASAGGLYP\nIDIYLYINNVEDYDKGIYLYQPISHSLLKIVPQKDINTDDLLEGNNIDIKNCSFLVFF\nGYNFNSSFLKYGELALLNSLIEIGCMSHNFDLVITSLGYTGCPIAGFKKNNIEKLLEL\nDHVNEHILFTNICGKE"
+feature	{"accession":"CP020762","feature":"gene","range":"3320..4249"}	Q_locus_tag	"B7466_00030"
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_locus_tag	"B7466_00030"
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_000846702.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_product	"bacteriocin biosynthesis cyclodehydratase"
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_protein_id	"ARJ10203.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"3320..4249"}	Q_translation	"MKTFIKPKDLFVEENNSEYILKKGYLHQHSIAIDKEESSKNFID\nNFKTLIAENQIELNENDDIIEDFNKLTQLNLIHQKIDTFNKICIITDKAAKAFFKDHL\nDQVDEIYEFNEVLERHEIEILNNQKNNLSINEVVKKQQSKFADMNVFVILSYANQPFI\nKAFNFLTNLLDMTYTLAFYDNENVFFTNIHHGETGCYECLERQLISKFPGTIENYFVP\nDAQNQDMYNLKLYSYILSIMINEINNIEIYGDSTLIGNVLHFYLPTYEYNFNFNKRQS\nTCSTCSTINNVLFKEQNMKSANILKRVLENDNL"
+feature	{"accession":"CP020762","feature":"gene","range":"4236..5561"}	Q_locus_tag	"B7466_00035"
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_locus_tag	"B7466_00035"
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_002479174.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_product	"streptolysin associated protein SagD"
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_protein_id	"ARJ10204.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"4236..5561"}	Q_translation	"MITFKNNLNFNLYRQNLLGGNVAGIWKDNSFFLGLNSYPIMNYH\nYVTAQFNNFEKNFLSEDFKVNYHLSGYGIYYNEALASFLGESSERYAFTLLYQNLKGK\nIIYASHAQISEQLKNTNSLVLPLALINIYFEEKDAKHYIYDDDVIQWIPLKSLYHPDH\nDVLVPLQMLVLFNKTIFKDEKQFTNSGVSTGTASHETFEKSLTNSIIEILQIDSYNLW\nWYGGIEGKTISVNIAEKLNEWFKRPSIVHKFLDNFDVSFTDISFDKPIHVVVCEVKSK\nAKDLSLPKYVVGVQGDMNLEQCIYRSLLECVTVLEYTMTEVWNNTTHFKNVTENIENH\nPIDNLDDNVMYYAKYGLNFNMQKRKNTFQNTKNANNLYEIINELKHLSHYACYLDITP\nVEFYNKNLVVVRTFIPELLTIAIPSYPPYLHPRYKEIGGIINDIPHPLA"
+feature	{"accession":"CP020762","feature":"gene","range":"5536..6150"}	Q_locus_tag	"B7466_00040"
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_locus_tag	"B7466_00040"
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_002460967.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_product	"CAAX protease family protein"
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_protein_id	"ARJ10205.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"5536..6150"}	Q_translation	"MIFLILWHSLIGLMFFLTCFPGILLIFIRKVAYFKYLTEFYKYI\nLVLIVVLLIDTCLFLSNTNIYLCVSVIIITPVIVYITEKSLLFNKNLFDFYNKNSKFI\nLSVLLAYPILEELNFRYFLYYFSLIYHYHFIQYIILSVLTFVFSHFLYQGKSSIVKIF\nFATIQAMIYLYFRDIFINIIIHMMFNILVFSSQMKKLNHSRIIK"
+feature	{"accession":"CP020762","feature":"gene","range":"complement(6398..7501)"}	Q_locus_tag	"B7466_00045"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_locus_tag	"B7466_00045"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_002492066.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_product	"two-component sensor histidine kinase"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_protein_id	"ARJ10206.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(6398..7501)"}	Q_translation	"MARIESIKTKLHRLNISVVIISIVVIFVLQLLLNILEFSNIGQS\nLYHDFWHQPHYLFTISSICINLFIPLIVIYMLTRFFYKKHLSRNIDYLNHIIKSLKSD\nDIDLKVTTTNIKEFNDVINEVQNINTFLKKRIADQLTIQNNFKKKLEIFEHDLKTPLT\nVMQGHIELLKKINNSELPNQEIKSKINSETKVIFNALERINNQIKIHINNVKLLPNHS\nDKINIEKVISTINESYNNKYILKNKTMDIQVDNKLLHNHIFLNNQILYHVIDNLINNA\nLKYANKELSINFKCLDQRLLQFSVINDGKQFTEDELKFAKEWGVKGKASNGSGIGLYF\nANEVIKQYNSEIILENIENKAKVSFIVDISKMT"
+feature	{"accession":"CP020762","feature":"gene","range":"complement(7489..8154)"}	Q_locus_tag	"B7466_00050"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(7489..8154)"}	Q_locus_tag	"B7466_00050"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(7489..8154)"}	Q_inference	"COORDINATES: similar to AA\nsequence:RefSeq:WP_002460964.1"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(7489..8154)"}	Q_note	"Derived by automated computational analysis using\ngene prediction method: Protein Homology."
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(7489..8154)"}	Q_codon_start	1
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(7489..8154)"}	Q_transl_table	11
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(7489..8154)"}	Q_product	"DNA-binding response regulator"
+feature	{"accession":"CP020762","feature":"CDS","range":"complement(7489..8154)"}	Q_protein_id	"ARJ10207.1"
+entry	CP020762	definition	Staphylococcus lugdunensis strain VISLISI_21 genome.
+entry	CP020762	organism	Staphylococcus lugdunensis
+entry	CP020763	definition	Staphylococcus lugdunensis strain VISLISI_25 genome.
+entry	CP020763	organism	Staphylococcus lugdunensis
+entry	CP020764	definition	Staphylococcus lugdunensis strain VISLISI_22 genome.
+entry	CP020764	organism	Staphylococcus lugdunensis
+entry	CP020765	definition	Staphylococcus lugdunensis strain VISLISI_22 plasmid pVISLISI_1, complete sequence.
+entry	CP020765	organism	Staphylococcus lugdunensis
+entry	CP020766	definition	Staphylococcus lugdunensis strain C_33 plasmid pVISLISI_5, complete sequence.
+entry	CP020766	organism	Staphylococcus lugdunensis
+entry	CP020767	definition	Staphylococcus lugdunensis strain C_33 plasmid pVISLISI_4 sequence.
+entry	CP020767	organism	Staphylococcus lugdunensis
+entry	CP020768	definition	Staphylococcus lugdunensis strain C_33 sequence.
+entry	CP020768	organism	Staphylococcus lugdunensis
+entry	CP020769	definition	Staphylococcus lugdunensis strain VISLISI_33 genome.
+entry	CP020769	organism	Staphylococcus lugdunensis
+entry	CP020770	definition	Staphylococcus lugdunensis strain VISLISI_33 plasmid pVISLISI_3, complete sequence.
+entry	CP020770	organism	Staphylococcus lugdunensis
+entry	CP020771	definition	Microcystis aeruginosa PCC 7806SL chromosome, complete genome.
+entry	CP020771	organism	Microcystis aeruginosa PCC 7806SL
+entry	CP020772	definition	Halobacillus mangrovi strain KTB 131 chromosome, complete genome.
+entry	CP020772	organism	Halobacillus mangrovi
+entry	CP020773	definition	Staphylococcus lutrae strain ATCC 700373 chromosome, complete genome.
+entry	CP020773	organism	Staphylococcus lutrae
+entry	CP020774	definition	Listeria monocytogenes strain H34 chromosome, complete genome.
+entry	CP020774	organism	Listeria monocytogenes
+entry	CP020775	definition	Campylobacter jejuni strain YH002 plasmid pCJP002, complete sequence.
+entry	CP020775	organism	Campylobacter jejuni
+entry	CP020776	definition	Campylobacter jejuni strain YH002 chromosome, complete genome.
+entry	CP020776	organism	Campylobacter jejuni
+entry	CP020777	definition	Candidatus Pelagibacter sp. RS39 genome.
+entry	CP020777	organism	Candidatus Pelagibacter sp. RS39
+entry	CP020778	definition	Candidatus Pelagibacter sp. RS40 genome.
+entry	CP020778	organism	Candidatus Pelagibacter sp. RS40
+entry	CP020803	definition	Bacillus cereus strain 25 genome.
+entry	CP020803	organism	Bacillus cereus
+entry	CP020804	definition	Bacillus cereus strain 29 genome.
+entry	CP020804	organism	Bacillus cereus
+entry	CP020805	definition	Bacillus velezensis strain 9D-6 chromosome, complete genome.
+entry	CP020805	organism	Bacillus velezensis
+entry	CP020806	definition	Lactobacillus sakei strain Probio65 genome.
+entry	CP020806	organism	Lactobacillus sakei
+entry	CP020807	definition	Lactobacillus sakei strain Probio65 plasmid pLS01, complete sequence.
+entry	CP020807	organism	Lactobacillus sakei
+entry	CP020808	definition	Lactobacillus sakei strain Probio65 plasmid pLS02, complete sequence.
+entry	CP020808	organism	Lactobacillus sakei
+entry	CP020809	definition	Mycobacterium dioxanotrophicus strain PH-06 chromosome, complete genome.
+entry	CP020809	organism	Mycobacterium dioxanotrophicus
+entry	CP020810	definition	Mycobacterium dioxanotrophicus strain PH-06 plasmid unnamed1, complete sequence.
+entry	CP020810	organism	Mycobacterium dioxanotrophicus
+entry	CP020811	definition	Mycobacterium dioxanotrophicus strain PH-06 plasmid unnamed2, complete sequence.
+entry	CP020811	organism	Mycobacterium dioxanotrophicus
+entry	CP020812	definition	Mycobacterium dioxanotrophicus strain PH-06 plasmid unnamed3, complete sequence.
+entry	CP020812	organism	Mycobacterium dioxanotrophicus
+entry	CP020813	definition	Mycobacterium dioxanotrophicus strain PH-06 plasmid unnamed4, complete sequence.
+entry	CP020813	organism	Mycobacterium dioxanotrophicus
+entry	CP020814	definition	Alkalihalobacillus krulwichiae strain AM31D chromosome, complete genome.
+entry	CP020814	organism	Alkalihalobacillus krulwichiae
+entry	CP020815	definition	Anoxybacillus flavithermus strain DSM 2641T chromosome, complete genome.
+entry	CP020815	organism	Anoxybacillus flavithermus
+entry	CP020816	definition	Lactobacillus plantarum strain LP2 chromosome, complete genome.
+entry	CP020816	organism	Lactobacillus plantarum
+entry	CP020817	definition	Enterobacter sp. Crenshaw chromosome, complete genome.
+entry	CP020817	organism	Enterobacter sp. Crenshaw
+entry	CP020818	definition	Bordetella bronchiseptica strain F709 chromosome, complete genome.
+entry	CP020818	organism	Bordetella bronchiseptica
+entry	CP020819	definition	Bordetella bronchiseptica strain D973 chromosome, complete genome.
+entry	CP020819	organism	Bordetella bronchiseptica
+entry	CP020820	definition	Pantoea vagans strain FBS135 chromosome, complete genome.
+entry	CP020820	organism	Pantoea vagans
+entry	CP020821	definition	Mycobacterium colombiense CECT 3035, complete genome.
+entry	CP020821	organism	Mycobacterium colombiense CECT 3035
+entry	CP020822	definition	Tenacibaculum maritimum strain TM-KORJJ chromosome, complete genome.
+entry	CP020822	organism	Tenacibaculum maritimum
+entry	CP020823	definition	Salmonella enterica subsp. enterica serovar Enteritidis strain CFSAN033541 chromosome, complete genome.
+entry	CP020823	organism	Salmonella enterica subsp. enterica serovar Enteritidis
+entry	CP020824	definition	Salmonella enterica subsp. enterica serovar Enteritidis strain CFSAN033541 plasmid pCFSAN033541, complete sequence.
+entry	CP020824	organism	Salmonella enterica subsp. enterica serovar Enteritidis
+entry	CP020825	definition	Salmonella enterica subsp. enterica serovar Enteritidis strain CFSAN033543 chromosome, complete genome.
+entry	CP020825	organism	Salmonella enterica subsp. enterica serovar Enteritidis
+entry	CP020826	definition	Salmonella enterica subsp. enterica serovar Enteritidis strain CFSAN033543 plasmid pCFSAN033543, complete sequence.
+entry	CP020826	organism	Salmonella enterica subsp. enterica serovar Enteritidis
+entry	CP020827	definition	Listeria monocytogenes strain CFSAN028538 chromosome, complete genome.
+entry	CP020827	organism	Listeria monocytogenes
+entry	CP020828	definition	Listeria monocytogenes strain CFSAN022990 chromosome, complete genome.
+entry	CP020828	organism	Listeria monocytogenes
+entry	CP020829	definition	Listeria monocytogenes strain CFSAN022990 plasmid pCFSAN022990, complete sequence.
+entry	CP020829	organism	Listeria monocytogenes
+entry	CP020830	definition	Listeria monocytogenes strain MOD1_LS152 chromosome, complete genome.
+entry	CP020830	organism	Listeria monocytogenes
+entry	CP020831	definition	Listeria monocytogenes strain PNUSAL000144 chromosome, complete genome.
+entry	CP020831	organism	Listeria monocytogenes
+entry	CP020832	definition	Listeria monocytogenes strain PNUSAL000096 chromosome, complete genome.
+entry	CP020832	organism	Listeria monocytogenes
+entry	CP020833	definition	Listeria monocytogenes strain CFSAN004330 chromosome, complete genome.
+entry	CP020833	organism	Listeria monocytogenes
+entry	CP020834	definition	Listeria monocytogenes strain CFSAN004330 plasmid pCFSAN004330, complete sequence.
+entry	CP020834	organism	Listeria monocytogenes
+entry	CP020835	definition	Escherichia coli strain CFSAN051542 chromosome, complete genome.
