@@ -136,7 +136,7 @@ export class MemDB extends AbstractDB {
                 const predicate: string = await this.nameConverter.getOriginalName(names[1]);
                 return Buffer.from(predicate, 'utf8');
             }))
-            .pipe(new streamlib.Unique());
+
 
     }
 

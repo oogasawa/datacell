@@ -155,20 +155,20 @@ export abstract class AbstractDB implements DataCellStore {
     /** @inheritdoc */
     async getAllPredicates(category: string): Promise<Readable> {
 
-        const r_stream: Readable = await this.getAllTables();
+        const rst: Readable = await this.getAllTables();
 
-        return r_stream
-            .pipe(new streamlib.Filter(async (t) => { // choose tables which match to the given category.
+        return rst
+            .pipe(streamlib.getAsyncFilter(1, async (tableName: Buffer) => { // choose tables which match to the given category.
                 // names = [category, predicate]
-                const names: string[] = this.nameConverter.parseTableName(t);
+                const names: string[] = this.nameConverter.parseTableName(tableName.toString());
                 const cat: string = await this.nameConverter.getOriginalName(names[0]);
                 return category === cat;
             }))
-            .pipe(new streamlib.Map(async (t) => { // map table names to predicates.
+            .pipe(streamlib.getAsyncMap(1, async (tableName: Buffer) => { // map table names to predicates.
                 // names = [category, predicate]
-                const names: string[] = this.nameConverter.parseTableName(t);
+                const names: string[] = this.nameConverter.parseTableName(tableName.toString());
                 const pred: string = await this.nameConverter.getOriginalName(names[1]);
-                return pred;
+                return Buffer.from(pred, 'utf8');
             }));
 
     }

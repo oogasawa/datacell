@@ -147,19 +147,19 @@ class AbstractDB {
     /** @inheritdoc */
     getAllPredicates(category) {
         return __awaiter(this, void 0, void 0, function* () {
-            const r_stream = yield this.getAllTables();
-            return r_stream
-                .pipe(new streamlib.Filter((t) => __awaiter(this, void 0, void 0, function* () {
+            const rst = yield this.getAllTables();
+            return rst
+                .pipe(streamlib.getAsyncFilter(1, (tableName) => __awaiter(this, void 0, void 0, function* () {
                 // names = [category, predicate]
-                const names = this.nameConverter.parseTableName(t);
+                const names = this.nameConverter.parseTableName(tableName.toString());
                 const cat = yield this.nameConverter.getOriginalName(names[0]);
                 return category === cat;
             })))
-                .pipe(new streamlib.Map((t) => __awaiter(this, void 0, void 0, function* () {
+                .pipe(streamlib.getAsyncMap(1, (tableName) => __awaiter(this, void 0, void 0, function* () {
                 // names = [category, predicate]
-                const names = this.nameConverter.parseTableName(t);
+                const names = this.nameConverter.parseTableName(tableName.toString());
                 const pred = yield this.nameConverter.getOriginalName(names[1]);
-                return pred;
+                return Buffer.from(pred, 'utf8');
             })));
         });
     }

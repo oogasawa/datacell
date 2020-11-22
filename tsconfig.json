@@ -17,6 +17,7 @@
 		"preserveConstEnums": true,
 		"sourceMap": true,
 		"lib":[
+			"es2020",
 			"es2020.string"
 		],
 		"types": [

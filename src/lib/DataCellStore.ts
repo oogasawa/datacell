@@ -76,9 +76,8 @@ export interface DataCellStore {
 
 
 
-	/** Returns a list of predicates corresponding to a given objectID.
+	/** Returns predicates corresponding to a given objectID in a category.
 	 *
-	 * objectID is assumed that it is unique in a given category. 
 	 *
 	 * @param category
 	 * @param objectID
@@ -86,7 +85,7 @@ export interface DataCellStore {
     _getPredicates(category: string, objectID: string): Promise<Readable>;
 
 
-	/** Returns a list of predicates corresponding to a given objectID.
+	/** Returns a list of predicates corresponding to a given objectID in a category.
 	 *
 	 * <code>cond.objectID</code> will be used for the search condition.
 	 * other properties are ignored.
